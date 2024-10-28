@@ -1,0 +1,149 @@
+% experiment1_validate_iid: Simulates detection events across various intensities 
+%                           and compares observed distributions of clicks and 
+%                           errors with theoretical distributions derived from
+%                           the i.i.d. model.
+%
+% Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
+% Licensed under the MIT License (see LICENSE file for full details).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Setup                                                                  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+rng(1);                    % Set the random seed for reproducibility
+
+restoredefaultpath; clear; % Restore default class path and clear workspace
+addpath(genpath('../.'));  % Add all subfolders to the search path
+
+% File path for loading/saving results (can be empty [])
+file_path = 'saved_data/experiment1_validate_iid'; 
+
+% Set to 'true' to load data, 'false' to save after computation
+loadData = true;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Session Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+runs = 1e4; % Total number of simulation runs
+
+% Variable settings
+variables = {'lambdas','alpha','dAB', 'pa0','pa1','pc0','pc1','pd0','pd1','pe',...
+             'dAE','pEB','k','Delta'};
+
+varR = {'dAE','pEB','k','Delta'};          % Random variables
+varF = setdiff(variables, varR, 'stable'); % Fixed variables
+
+% Pulse options
+N = 1e4;    % Number of pulses in each simulation run
+Nl = 2;     % Number of intensity levels (lambdas)
+
+% Variance options
+noise = 0;  % Noise level for simulation
+sigma = 0;  % Standard deviation of the random variables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bob's Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Set detection parameters for Bob's system (based on GYS parameters)
+pa = 0.0;     % After-pulsing probability
+pc = 0.045;   % Detector efficiency
+pd = 1.7e-6;  % Dark count probability
+pe = 0.033;   % Misalignment probability
+
+% Apply slight variation (+/- 10%) to represent detector differences
+pa0 = pa * 0.9;   pa1 = pa * 1.1;
+pc0 = pc * 0.9;   pc1 = pc * 1.1;
+pd0 = pd * 0.9;   pd1 = pd * 1.1;
+
+% Group Bob's parameters
+thetaB = {pa0, pa1, pc0, pc1, pd0, pd1, pe}; 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Alice's Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+alpha = 0.21; % Attenuation coefficient in the channel
+dAB = 50;     % Distance between Alice and Bob (in km)
+
+% Get optimal intensity levels
+lambdas = getLambdas(Nl, alpha, dAB, thetaB);
+
+% Group Alice's parameters
+thetaA = {lambdas, alpha, dAB}; 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Eve's Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+dAE = 10;     % Distance between Alice and Eve
+k = 3;        % Initial number of photons intercepted by Eve
+Delta = 0.2;  % Initial interception rate by Eve
+
+% Optimize pEB for Eve to remain undetected
+pEB = get_pEB(thetaA, thetaB, dAE, k);
+
+% Group Eve's parameters
+thetaE = {dAE, pEB, k, Delta};
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Process Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Collect parameters for Alice, Bob, and Eve
+thetas = {thetaA, thetaB, thetaE};
+
+% Process random and fixed variables
+[varR, varF] = processVars(thetas, varF, varR); 
+
+% Process parameter priors and obtain random variables
+[thetaP, thetaR, thetaF, varR, varF] = processParams(thetas, thetas, varF, varR);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Simulation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if(~loadData)
+
+    % Initialize result matrices for counts, errors, and detection events
+    C = zeros(runs, 8 * Nl);     % Clicks per intensity/basis-match/detection-event 
+    m = zeros(runs, 2 * Nl);     % Erroneous clicks per intensity/basis-match
+    M = zeros(runs, 2 * Nl);     % XOR clicks per intensity/basis-match
+    both = zeros(runs, 2 * Nl);  % AND clicks per intensity/basis-match
+    
+    % Run simulation across the specified number of runs
+    for i = 1:runs
+        
+        % Simulate pulses and measure detection events
+        [C(i,:), D0, D1, l, a, b, x] = simulate(N, thetas, varR, 'print', false); 
+        [m(i,:), M(i,:), both(i,:)] = measure(Nl, D0, D1, l, a, b, x);
+    
+        progress(i, runs, 'simulating sessions');
+    end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Load/Save Data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    if(~isempty(file_path))
+        save(file_path, 'C', 'm', 'M', 'both');
+    end
+
+else
+    load(file_path);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Display Results
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Compute iid detection probabilities and plot results
+Ps_iid = P_iid(thetaR, thetaF, varR, varF);
+plotPs(Ps_iid, C);
+set(gcf, 'Name', 'Probabilities', 'NumberTitle', 'off');
+
+% Compute iid error rates and gain, and visualize them
+[deltaQs_iid, Qs_iid] = deltaQ_iid(thetaR, thetaF, varR, varF);
+plot_deltaQ(N, m, M, deltaQs_iid, Qs_iid);
+set(gcf, 'Name', 'Gain/Error', 'NumberTitle', 'off');
