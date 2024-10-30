@@ -1,6 +1,6 @@
 function [C, D0, D1, l, a, b, x, e, sample_thetas] = simulate(N, thetas, varR, varargin)
     %simulate: Simulates the detection events for quantum key distribution (QKD) 
-    %           with or without noise, handling both matching and non-matching basis choices.
+    %          under a generalized PNS attack
     %
     % Inputs:
     %     N          - Total number of pulses to simulate

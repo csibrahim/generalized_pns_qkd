@@ -115,7 +115,8 @@ thetas = {thetaA, thetaB, thetaE};
 if (~loadData)
 
     % Simulate session data
-    [C, D0, D1, l, a, b, x, e, sample_thetas] = simulate(N, thetas, varR, 'noise', noise);
+    [C, D0, D1, l, a, b, x, e, sample_thetas] = simulate(N, thetas, varR, ...
+                                                         'noise', noise);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Process and Get Prior Parameters
@@ -169,7 +170,7 @@ if (~loadData)
     close all;
     
     if (~isempty(file_path))
-        save(file_path, 'samples', 'thetaR', 'thetaF', 'thetaP', 'varR', 'varF', 'R_theory', 'Rs');
+        save(file_path, 'samples', 'thetaR', 'thetaP', 'R_theory', 'Rs');
     end
 
 else

@@ -30,15 +30,15 @@ function max_k = getMaxK(thetaA, thetaB)
     f = @(logK) kCost(logK, thetaA, thetaB, varR, varF);
     
     % Use fminunc to find the optimal log(k) that minimizes
-    % KL divergence initialized at 0
+    % KL divergence initialized at log(max_lambda)
     [logK, ~, ~, output] = fminunc(f, log(max_lambda), options);
 
     max_k = exp(logK) + 1;
     
     % Issue a warning if optimization does not converge and set max_k = max_lambda
     if output.iterations == 0
-        warning("Finding maximum k failed, setting to max_k = max(max_lambda, 1)");
-        max_k = max_lambda;
+        warning("Finding maximum k failed, setting to max_k = max(max_lambda, 2)");
+        max_k = max(max_lambda, 2);
     end
 
     % Ensure a minimum threshold for max_k
@@ -46,13 +46,9 @@ function max_k = getMaxK(thetaA, thetaB)
 end
 
 function [KL, d_logK] = kCost(logK, thetaA, thetaB, varR, varF)
-    % KCOST: Computes the KL divergence and gradient to quantify the detectability 
-    %        of Eve's interception of k photons, where pEB = 1 would be required 
-    %        to avoid detection by Bob.
-    %
-    %        The KL divergence is calculated between:
-    %        1) The distribution of detector clicks at Bob when Eve does not intercept.
-    %        2) The distribution when Eve intercepts k photons and transmits with pEB = 1.
+    %kCost: The KL divergence is calculated between:
+    %       1) The distribution of detector clicks at Bob when Eve does not intercept.
+    %       2) The distribution when Eve intercepts k photons and transmits with pEB = 1.
     %
     % Inputs:
     %   logK    - Log-transformed k for unconstrained optimization
@@ -77,13 +73,14 @@ function [KL, d_logK] = kCost(logK, thetaA, thetaB, varR, varF)
     thetaF = [thetaA, thetaB, thetaE];
     thetaR = {k};
 
+    % Assume matching basis
     a = 1; % basis choice for Alice
     b = 1; % basis choice for Bob
 
     Ps0 = Pabe(thetaR, thetaF, varR, varF, a, b, 0);  % No interception
     [Ps1, d_thetaR1] = Pabe(thetaR, thetaF, varR, varF, a, b, 1);  % Interception with k photons
 
-    % Compute KL divergence D(Ps0 || Ps1)
+    % Compute KL divergence
     KL1 = Ps0 .* log(Ps0); % Expected log likelihood for Ps0
     KL0 = Ps0 .* log(Ps1); % Expected log likelihood under Ps1
     KL = sum(KL1 - KL0);   % Sum of differences provides KL divergence

@@ -49,17 +49,7 @@ end
 function [deltaQs, Qs] = deltaQ_iid_ab(thetaR, thetaF, varR, varF, a, b, both)
     %deltaQ_iid_ab: This function computes the probabilities for a given 
     %   basis configuration (a, b) in the iid case, by marginalizing over Alice's 
-    %   bit choice. The probabilities are averaged over the possible bit choices 
-    %   (x = 0, 1).
-    %
-    % Inputs:
-    %   a      - Alice's basis choice (0 or 1)
-    %   b      - Bob's basis choice (0 or 1)
-    %   both   - Logical flag for XOR detection or both detectors
-    %
-    % Outputs:
-    %   deltaQs - Error probabilities for the given basis configuration
-    %   Qs      - Detection probabilities for the given basis configuration
+    %   bit choice.
 
     % Compute probabilities for both x = 0 and x = 1
     [deltaQs0, Qs0] = deltaQ_iid_abx(thetaR, thetaF, varR, varF, a, b, 0, both);
@@ -76,16 +66,6 @@ function [deltaQs, Qs] = deltaQ_iid_abx(thetaR, thetaF, varR, varF, a, b, x, bot
     %   It uses the detection probabilities P from the Pabx function. Based on the 
     %   'both' flag, it computes either the XOR detection (P01 + P10) or includes 
     %   both detectors (P01 + P10 + P11).
-    %
-    % Inputs:
-    %   a      - Alice's basis choice (0 or 1)
-    %   b      - Bob's basis choice (0 or 1)
-    %   x      - Alice's bit choice (0 or 1)
-    %   both   - Logical flag for XOR detection or both detectors
-    %
-    % Outputs:
-    %   deltaQs - Error probabilities for the given configuration
-    %   Qs      - Detection probabilities for the given configuration
 
     % Get detection probabilities for the given configuration
     Ps = Pabx(thetaR, thetaF, varR, varF, a, b, x);

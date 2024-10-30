@@ -34,6 +34,10 @@ function [deltaQs, Qs, Deltas] = deltaQ(thetaR, thetaF, varR, varF, both)
         both = 0;  % Default: consider XOR detection
     end
 
+    if(~iscell(thetaR))
+        thetaR = theta2cell(thetaR, varR);
+    end
+
     % Concatenate random and fixed variables into a single array
     vars = [varR(:)' varF(:)'];
     thetas = [thetaR(:)' thetaF(:)'];
@@ -57,7 +61,7 @@ function [deltaQs, Qs, Deltas] = deltaQ(thetaR, thetaF, varR, varF, both)
         % Concatenate the random parameters into a single array
         thetaR = [thetaR{:}];
 
-        [n, ~] = size(thetaR);  % Number of samples
+        n = length(Deltas);  % Number of samples
 
         % Initialize output arrays for the error and detection probabilities
         deltaQs = zeros(n, 2 * Nl);

@@ -36,8 +36,8 @@ function [log_likelihood, d_thetaR] = logLikelihood(thetaR, thetaF, varR, varF, 
     S = sum(Ps_eps, 2); 
     Ps_norm = Ps_eps ./ S;
 
-    % Compute the log-likelihood based on the normalized probabilities
-    log_likelihood = sum(C .* log(Ps_norm), 2);
+    % Compute the log-likelihood based (unnormalized)
+    log_likelihood = sum(C .* log(Ps_norm), 2);% -sum(gammaln(C+1),2) + gammaln(sum(C+1,2));
 
     if nargout > 1
         % Compute the gradient of the log-likelihood with respect to thetaR

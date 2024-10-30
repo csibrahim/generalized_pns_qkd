@@ -25,13 +25,16 @@ loadData = true;
 % Session Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+N = 1e9;  % Number of pulses in each session simulation run
+
 % Define variable sets for the theoretical model
 varF = {'lambdas', 'alpha', ...
         'pa0', 'pa1', 'pc0', 'pc1', 'pd0', 'pd1', 'pe', ...
         'dAE', 'k', 'Delta'}; % Fixed variables
 varR = {'dAB', 'pEB'};        % Random variables
 
-N = 1e9;  % Number of pulses in each session simulation run
+% Variance options
+noise = 0;  % noise to add during simulation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Display options
@@ -110,19 +113,21 @@ end
 
 % Plot confidence intervals and expected values for the decoy protocol and each after-pulsing probability
 for i = 1:numel(Qs)
+    
     sigma = sqrt(V_error(N, Qs{i}, deltas{i})); % Calculate standard deviation for confidence interval
-    upper = deltas{i} + width * sigma;         % Upper bound of confidence interval
-    expected = deltas{i};                      % Expected error rate
-    lower = deltas{i} - width * sigma;         % Lower bound of confidence interval
+    upper = deltas{i} + width * sigma;          % Upper bound of confidence interval
+    expected = deltas{i};                       % Expected error rate
+    lower = deltas{i} - width * sigma;          % Lower bound of confidence interval
 
     % Plot confidence interval as shaded region
     h_CI = fill([dABs', fliplr(dABs')], [upper', fliplr(lower')], [0 0 0], ...
                 'EdgeColor', 'k', 'EdgeAlpha', 0.15, 'FaceAlpha', 0.15);
+
     % Plot expected value
     h_E = plot(dABs, expected, 'k-', 'LineWidth', lineWidth);
     h_E.Color = [0 0 0 0.5];
 
-    % Label each line for clarity in the plot
+    % Place a label at the end of each line
     if i == 1
         lineLabel = {'Decoy', '($p_{a}$=\,0\%)'};
     else
@@ -154,6 +159,8 @@ else
     n_dABs = length(dABs);
     measured = zeros(n_dABs, n_pa);
 
+    Nl = 1; % Only one intensity (mu) is used for the key generation
+    
     % Loop through each distance and after-pulsing setting
     for i = 1:length(dABs)
         for j = 1:n_pa
@@ -166,9 +173,9 @@ else
             thetas = {thetaA, thetaB, thetaE};
 
             % Run simulation and calculate observed probabilities
-            [~, D0, D1, l, a, b, x] = simulate(N, thetas, varR, 'match', true);
-
-            Nl = 1; % Only one intensity (mu) is used for the key generation
+            [~, D0, D1, l, a, b, x] = simulate(N, thetas, varR, ...
+                                              'match', true, ...
+                                              'noise', noise);
 
             [m, M, both] = measure(Nl, D0, D1, l, a, b, x);
 

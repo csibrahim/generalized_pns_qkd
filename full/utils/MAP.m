@@ -1,11 +1,11 @@
-function thetaR_map = MAP(C, varR, varF, thetaF, thetaP, varargin)
+function thetaR_MAP = MAP(C, varR, varF, thetaF, thetaP, varargin)
     %MAP: This function computes the Maximum A Posteriori (MAP) estimate for the
-    %      system parameters by maximizing the posterior distribution, which is 
-    %      the combination of both the likelihood (derived from observations `C`)
-    %      and the prior distributions of the parameters. The function specifically
-    %      optimizes Eve's parameters, while initializing the remaining variables 
-    %      to the expected values of their priors and keeping them fixed during
-    %      the optimization.
+    %     system parameters by maximizing the posterior distribution, which is 
+    %     the combination of both the likelihood (derived from observations `C`)
+    %     and the prior distributions of the parameters. The function specifically
+    %     optimizes Eve's parameters, while initializing the remaining variables 
+    %     to the expected values of their priors and keeping them fixed during
+    %     the optimization.
     %
     % Inputs:
     %     C          - Counts (observations) used to compute the likelihood
@@ -16,9 +16,10 @@ function thetaR_map = MAP(C, varR, varF, thetaF, thetaP, varargin)
     %     varargin   - Optional name-value pair arguments:
     %                     'maxEpochs' - Maximum epochs for outer optimization (default: 200)
     %                     'maxIters'  - Maximum iterations for inner optimization (default: 50)
+    %                     'tol'       - Tolerance threshold for early stopping (default: 1e-5)
     %
     % Outputs:
-    %     thetaR_map - MAP estimated values for the random variables
+    %     thetaR_MAP - MAP estimated values for the random variables
     %
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
     % Licensed under the MIT License (see LICENSE file for full details).
@@ -27,6 +28,7 @@ function thetaR_map = MAP(C, varR, varF, thetaF, thetaP, varargin)
     p = inputParser;
     addParameter(p, 'maxEpochs', 200);
     addParameter(p, 'maxIters', 50);
+    addParameter(p, 'tol', 1e-5);
 
     % Parse input arguments
     parse(p, varargin{:});
@@ -34,6 +36,7 @@ function thetaR_map = MAP(C, varR, varF, thetaF, thetaP, varargin)
     % Assign parsed values to variables
     maxEpochs = p.Results.maxEpochs;
     maxIters = p.Results.maxIters;
+    tol = p.Results.tol;
 
     % Extract prior parameters (alphas, betas, upper bounds, lower bounds)
     [alphas, betas, ub, lb] = deal(thetaP{:});
@@ -71,17 +74,17 @@ function thetaR_map = MAP(C, varR, varF, thetaF, thetaP, varargin)
     thetaP_E = {alphas_E, betas_E, ub_E, lb_E};
 
     % Perform MAP estimation for Eve's variables
-    thetaR_E = MAP_E(C, varR_E, varF_E, thetaR_E, thetaF_E, thetaP_E, maxIters, maxEpochs);
+    thetaR_E = MAP_E(C, varR_E, varF_E, thetaR_E, thetaF_E, thetaP_E, maxIters, maxEpochs, tol);
 
     % Update the MAP estimate with the optimized values of Eve's variables
     thetaR(isEvesVars) = thetaR_E;
     
     % Combine all thetaR values into a single array for output
-    thetaR_map = [thetaR{:}];
+    thetaR_MAP = [thetaR{:}];
     
 end
 
-function thetaR = MAP_E(C, varR, varF, thetaR, thetaF, thetaP, maxIters, maxEpochs)
+function thetaR = MAP_E(C, varR, varF, thetaR, thetaF, thetaP, maxIters, maxEpochs, tol)
     % MAP_E: Performs the MAP estimation specifically for Eve's variables by
     %        iteratively optimizing each parameter using the log-posterior PDF.
     %
@@ -94,6 +97,7 @@ function thetaR = MAP_E(C, varR, varF, thetaR, thetaF, thetaP, maxIters, maxEpoc
     %     thetaP     - Prior parameters for Eve's variables (alphas, betas, ub, lb)
     %     maxIters   - Maximum number of iterations for the inner optimization
     %     maxEpochs  - Maximum number of epochs for the outer optimization
+    %     tol        - Tolerance threshold for early stopping
     %
     % Outputs:
     %     thetaR     - MAP estimated values for Eve's variables
@@ -130,7 +134,9 @@ function thetaR = MAP_E(C, varR, varF, thetaR, thetaF, thetaP, maxIters, maxEpoc
 
             % Optimize phi using fminunc
             phiR_i = fminunc(logpdf, phi0_i, options);
-            thetaR_i = Theta(phiR_i, thetaP_i);  % Convert back to thetaR
+
+            % Convert back to thetaR
+            thetaR_i = Theta(phiR_i, thetaP_i); 
 
             % Update the variable with the new optimized value
             thetaR{i} = thetaR_i;
@@ -140,7 +146,7 @@ function thetaR = MAP_E(C, varR, varF, thetaR, thetaF, thetaP, maxIters, maxEpoc
         end
 
         % Stop early if the change in thetaR is below a small tolerance
-        if norm([thetaR{:}] - [thetaR_old{:}]) < 1e-5
+        if norm([thetaR{:}] - [thetaR_old{:}]) < tol
             progress(maxEpochs*numel(varR), maxEpochs*numel(varR), 'optimizing');
             break;
         end

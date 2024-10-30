@@ -101,10 +101,13 @@ function [cost, d_logLambda] = maxLambda(logLambda, varR, varF, alpha, dAB, thet
     thetaF = [{alpha} {dAB} thetaB thetaE];
     thetaR = {lambda};
 
-    % Calculate probabilities and their gradients for detection events
-    [Ps, d_thetaR] = Pabe(thetaR, thetaF, varR, varF, 0, 0, 0);
+    % Calculate probabilities and their gradients (assuming matching basis with no Eve interception)
+    a = 0; % Alice'a basis
+    b = 0; % Bob's basis
+    e = 1; % Eve's interception flag
+    [Ps, d_thetaR] = Pabe(thetaR, thetaF, varR, varF, a, b, e);
 
-    % Cost is the sum of probabilities for no-click (0) and full-click (end) events
+    % Cost is the sum of probabilities for no-click and full-click events
     cost = Ps(1) + Ps(end);
 
     % Gradient w.r.t lambda
@@ -163,7 +166,7 @@ function [KL, d_logLambda] = minLambda(logLambda, varR, varF, alpha, dAB, thetaB
     d_lambda0 = d_thetaR0{1}; % Derivative of Ps0 w.r.t lambda
 
     % Apply chain rule for the gradient of KL divergence w.r.t lambda
-    d_KL1 = d_lambda1 .* (log(Ps1) - log(Ps0) + 1);
+    d_KL1 = (log(Ps1) - log(Ps0) + 1) .* d_lambda1;
     d_KL0 = (Ps1 ./ Ps0) .* d_lambda0;
 
     % Sum the gradient terms and apply the lambda derivative factor

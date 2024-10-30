@@ -15,6 +15,11 @@ rng(1);                    % Set the random seed for reproducibility
 restoredefaultpath; clear; % Restore default class path and clear workspace
 addpath(genpath('../.'));  % Add all subfolders to the search path
 
+% Variable settings
+variables = {'lambdas','alpha','dAB', ...
+             'pa0','pa1','pc0','pc1','pd0','pd1','pe',...
+             'dAE','pEB','k','Delta'};
+
 % File path for loading/saving results (can be empty [])
 file_path = 'saved_data/experiment2_validate_hmm'; 
 
@@ -27,16 +32,12 @@ loadData = true;
 
 runs = 1e4; % Total number of simulation runs
 
-% Variable settings
-variables = {'lambdas','alpha','dAB', 'pa0','pa1','pc0','pc1','pd0','pd1','pe',...
-             'dAE','pEB','k','Delta'};
-
-varR = {'dAE','pEB','k','Delta'};          % Random variables
-varF = setdiff(variables, varR, 'stable'); % Fixed variables
-
 % Pulse options
 N = 1e4;    % Number of pulses in each simulation run
 Nl = 2;     % Number of intensity levels (lambdas)
+
+varR = {'dAE','pEB','k','Delta'};          % Random variables
+varF = setdiff(variables, varR, 'stable'); % Fixed variables
 
 % Variance options
 noise = 0;  % Noise level for simulation
@@ -98,7 +99,7 @@ thetas = {thetaA, thetaB, thetaE};
 [varR, varF] = processVars(thetas, varF, varR); 
 
 % Process parameter priors and obtain random variables
-[thetaP, thetaR, thetaF, varR, varF] = processParams(thetas, thetas, varF, varR);
+[thetaP, thetaR, thetaF, varR, varF] = processParams(thetas, thetas, varF, varR, sigma);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Simulation
@@ -116,7 +117,9 @@ if(~loadData)
     for i = 1:runs
         
         % Simulate pulses and measure detection events
-        [C(i,:), D0, D1, l, a, b, x] = simulate(N, thetas, varR, 'print', false); 
+        [C(i,:), D0, D1, l, a, b, x] = simulate(N, thetas, varR, ...
+                                                'print', false, ...
+                                                'noise', noise); 
         [m(i,:), M(i,:), both(i,:)] = measure(Nl, D0, D1, l, a, b, x);
     
         progress(i, runs, 'simulating sessions');

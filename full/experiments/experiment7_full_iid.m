@@ -13,6 +13,11 @@ rng(1);                     % Set the random seed for reproducibility
 restoredefaultpath; clear;  % Restore default class path and clear workspace
 addpath(genpath('../.'));   % Add all subfolders to the search path
 
+% Variable options
+variables = {'lambdas','alpha','dAB', ...
+             'pa0','pa1','pc0','pc1','pd0','pd1','pe', ...
+             'dAE','pEB','k','Delta'};
+
 % File path for loading/saving results (can be empty [])
 file_path = 'saved_data/experiment7_full_iid'; 
 
@@ -23,15 +28,16 @@ loadData = true;
 % Session Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Variables options
-varR = {'lambdas','alpha','dAB', ...
-        'pa0','pa1','pc0','pc1','pd0','pd1','pe', ...
-        'dAE','pEB','k','Delta'}; % Random variables
-varF = {}; % Fixed variables
-
 % Pulse options
 N = 1e8;           % Number of pulses in each simulation run
 Nl = 9;            % Number of intensity levels (lambdas)
+
+% Variables options
+varR = variables; % All are random variables
+varF = {}; % none are fixed
+
+% Get LaTeX-formatted labels
+[param_labels, R_labels] = getLabels(Nl, varR);
 
 % Variance options
 noise = 0.05;      % Noise to add during simulation
@@ -105,9 +111,6 @@ thetas = {thetaA, thetaB, thetaE};
 % Process random and fixed variables
 [varR, varF] = processVars(thetas, varF, varR, sigma); 
 
-% Get LaTeX-formatted labels
-[param_labels, R_labels] = getLabels(Nl, varR);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Simulation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,7 +118,8 @@ thetas = {thetaA, thetaB, thetaE};
 if (~loadData)
 
     % Simulate the session
-    [C, D0, D1, l, a, b, x, e, sample_thetas] = simulate(N, thetas, varR, 'noise', noise);
+    [C, D0, D1, l, a, b, x, e, sample_thetas] = simulate(N, thetas, varR, ...
+                                                         'noise', noise);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Process and Get Prior Parameters
@@ -169,7 +173,7 @@ if (~loadData)
     close all;
     
     if (~isempty(file_path))
-        save(file_path, 'samples', 'thetaR', 'thetaF', 'thetaP', 'varR', 'varF', 'R_theory', 'Rs');
+        save(file_path, 'samples', 'thetaR', 'thetaP', 'R_theory', 'Rs');
     end
 
 else

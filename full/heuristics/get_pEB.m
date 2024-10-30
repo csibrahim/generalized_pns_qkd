@@ -1,9 +1,9 @@
 function pEB = get_pEB(thetaA, thetaB, dAE, k)
-    % get_pEB: Determines the optimal probability of transmission from Eve to Bob (pEB) 
-    %          that minimizes the Kullback-Leibler (KL) divergence between the distributions
-    %          of detection events at Bob's detectors, given two distinct settings:
-    %          1. Eve intercepts `k` photons and transmits the remainder with a `pEB` probability.
-    %          2. Eve does not intercept photons, allowing direct transmission.
+    %get_pEB: Determines the optimal probability of transmission from Eve to Bob (pEB) 
+    %         that minimizes the Kullback-Leibler (KL) divergence between the distributions
+    %         of detection events at Bob's detectors, given two distinct settings:
+    %         1. Eve intercepts `k` photons and transmits the remainder with a `pEB` probability.
+    %         2. Eve does not intercept photons, allowing direct transmission.
     %
     % Inputs:
     %   thetaA - Parameters associated with Alice's transmission settings (lambdas, alpha, dAB)
@@ -45,9 +45,9 @@ function pEB = get_pEB(thetaA, thetaB, dAE, k)
 end
 
 function [KL, d_logit_pEB] = pEBcost(varR, varF, thetaA, thetaB, dAE, k, logit_pEB)
-    % PEBCOST: Computes the Kullback-Leibler (KL) divergence and its gradient with respect 
-    %          to pEB, quantifying the divergence between two probability distributions of 
-    %          detection events at Bob's detectors, one with Eve’s interception and one without.
+    %pEBcost: Computes the Kullback-Leibler (KL) divergence and its gradient with respect 
+    %         to pEB, quantifying the divergence between two probability distributions of 
+    %         detection events at Bob's detectors, one with Eve’s interception and one without.
     %
     % Inputs:
     %   varR       - Cell array of random variable names (only 'pEB' in this case)

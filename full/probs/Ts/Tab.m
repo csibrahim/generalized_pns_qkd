@@ -1,10 +1,8 @@
 function [Ts, d_thetaR] = Tab(thetaR, thetaF, varR, varF, a, b)
     %Tab: This function computes the transition matrix by marginalizing over 
-    %     Alice's bit choice (x = 0 or x = 1), producing a matrix that accounts 
-    %     for both possibilities equally. If requested, the function also computes 
-    %     the partial derivatives of the transition matrix with respect to the 
-    %     random variables in thetaR.
-    %
+    %     both Alice's bit choice, x, and the eavesdropping flag, e. If requested, 
+    %     the function also computes the partial derivatives of the transition
+    %     matrix with respect to the parameters in thetaR.
     % Inputs:
     %   thetaR - Array of system parameters treated as random variables (e.g., lambdas, Delta, etc.)
     %   thetaF - Array of system parameters treated as fixed variables

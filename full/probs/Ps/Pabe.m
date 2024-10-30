@@ -26,6 +26,7 @@ function [Ps, d_thetaR] = Pabe(thetaR, thetaF, varR, varF, a, b, e)
 
     % Check if partial derivatives are requested
     if nargout > 1
+
         % Compute probabilities and derivatives for x = 0 and x = 1
         [Ps0, d_thetaR0] = Pabxe(thetaR, thetaF, varR, varF, a, b, 0, e);
         [Ps1, d_thetaR1] = Pabxe(thetaR, thetaF, varR, varF, a, b, 1, e);
@@ -37,10 +38,13 @@ function [Ps, d_thetaR] = Pabe(thetaR, thetaF, varR, varF, a, b, e)
         for i = 1:numel(d_thetaR)
             d_thetaR{i} = (d_thetaR0{i} + d_thetaR1{i}) / 2;
         end
+        
     else
-        % If no derivatives are requested, just compute probabilities
+
+        % Compute probabilities for x = 0 and x = 1
         Ps0 = Pabxe(thetaR, thetaF, varR, varF, a, b, 0, e);
         Ps1 = Pabxe(thetaR, thetaF, varR, varF, a, b, 1, e);
+
     end
 
     % Marginalize over Alice's bit choice (x)
