@@ -6,16 +6,16 @@ function progress(index, total, msg)
     %            percentage form and elapsed time.
     %
     % Inputs:
-    %     index  - Current step or iteration number
-    %     total  - Total number of steps or iterations
-    %     msg    - Custom message to display with the progress percentage
+    %     index         - Current step or iteration number
+    %     total         - Total number of steps or iterations
+    %     msg           - Custom message to display with the progress percentage
     %
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
     % Licensed under the MIT License (see LICENSE file for full details).
 
     % Set default values
-    minTime = 1e-1;    % Minimum time to pass before updating the progress
-    precision = 1e-2;  % The percentage precision to be displayed
+    minTime = 1e-1
+    precision = 1e-2;
     
     persistent lastUpdateTime lastPercent lastTimeDisplay lastPrintedLength startTime
 
@@ -31,8 +31,8 @@ function progress(index, total, msg)
 
     currentTime = toc(startTime); % Elapsed time since start in seconds
 
-    % Allow update if it's the last iteration
-    if currentTime - lastUpdateTime < minTime && index ~= total
+    % Check if at least minTime seconds have passed since last update
+    if currentTime - lastUpdateTime < minTime
         return;
     end
 
@@ -53,26 +53,21 @@ function progress(index, total, msg)
     fprintf(eraseStr);
 
     % Compute estimated remaining time
-    if index > 0 && index < total
+    if index > 0
         estimatedTotalTime = currentTime * total / index;
         remainingTime = estimatedTotalTime - currentTime;
     else
-        remainingTime = 0;
+        remainingTime = Inf;
     end
 
     % Format elapsed time
     elapsedTimeStr = formatTime(currentTime);
 
-    % Build the display string based on whether it's the last iteration
-    if index == total
-        % On the last iteration, only display elapsed time
-        displayStr = sprintf('%s %.2f%% [Elapsed %s]', msg, percentComplete, elapsedTimeStr);
-    else
-        % Format remaining time
-        remainingTimeStr = formatTime(remainingTime);
-        % Display both elapsed and remaining time
-        displayStr = sprintf('%s %.2f%% [Elapsed %s, Remaining %s]', msg, percentComplete, elapsedTimeStr, remainingTimeStr);
-    end
+    % Format remaining time
+    remainingTimeStr = formatTime(remainingTime);
+
+    % Build the display string
+    displayStr = sprintf('%s %.2f%% [Elapsed %s, Remaining %s]', msg, percentComplete, elapsedTimeStr, remainingTimeStr);
 
     % Print the new progress line
     fprintf('%s', displayStr);
@@ -88,6 +83,12 @@ function progress(index, total, msg)
     % If the loop is complete, print a new line and reset
     if index == total
         fprintf('\n');
+        % Reset persistent variables for the next use
+        lastUpdateTime = [];
+        lastPercent = [];
+        lastTimeDisplay = [];
+        lastPrintedLength = [];
+        startTime = [];
     end
 
     function timeStr = formatTime(t)
