@@ -1,4 +1,4 @@
-function progress(index, total, msg)
+function progress(index, total, msg, minTime, precision)
     %progress: Displays the progress of a process as a percentage and elapsed time with a custom message.
     %
     %            This function uses persistent variables to update the progress and only
@@ -6,97 +6,109 @@ function progress(index, total, msg)
     %            percentage form and elapsed time.
     %
     % Inputs:
-    %     index  - Current step or iteration number
-    %     total  - Total number of steps or iterations
-    %     msg    - Custom message to display with the progress percentage
+    %     index     - Current step or iteration number
+    %     total     - Total number of steps or iterations
+    %     msg       - Custom message to display with the progress percentage
+    %     minTime   - Minimum time that has to pass before updating the progress (default: 1e-1)
+    %     precision - The percentage precision to be displayed (default: 1e-2)
     %
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
     % Licensed under the MIT License (see LICENSE file for full details).
 
-    persistent str; % Persistent string for previous output
-    persistent startTime; % Persistent start time for total elapsed
-    persistent lastTimeStr; % Store the last time string for proper backspacing
-    persistent lastPercentage; % Store the last percentage displayed
-    persistent lastUpdateTime; % Store the time of the last update
+    % Set default values
+    if (nargin < 4), minTime = 1e-1; end
+    if (nargin < 5), precision = 1e-2; end
 
-    % Initialize/Reset at the beginning of each new process
+    persistent lastUpdateTime lastPercent lastTimeDisplay lastPrintedLength startTime
+
+    % Check if this is the start of a new loop
     if index == 1 || isempty(startTime)
-        str = [];
-        startTime = tic;
-        lastTimeStr = [];
-        lastPercentage = -1; % Initialize to impossible value to force first update
-        lastUpdateTime = 0; % Initialize last update time
+        % Initialize persistent variables
+        startTime = tic; % Record start time
+        lastUpdateTime = 0; % Time of last update
+        lastPercent = 0;
+        lastTimeDisplay = 0;
+        lastPrintedLength = 0;
     end
 
-    % Calculate elapsed time
-    elapsedSecs = toc(startTime);
+    currentTime = toc(startTime); % Elapsed time since start in seconds
 
-    timeSinceLastUpdate = (elapsedSecs - lastUpdateTime);
-
-    if timeSinceLastUpdate < 0.1 && lastPercentage >= 0 && index < total
+    % Check if at least minTime seconds have passed since last update
+    if currentTime - lastUpdateTime < minTime
         return;
     end
 
-    hours = floor(elapsedSecs / 3600);
-    minutes = floor(mod(elapsedSecs, 3600) / 60);
-    seconds = floor(mod(elapsedSecs, 60));
+    % Compute percentage complete
+    percentComplete = (index / total) * 100;
+    
+    % Check if percentage or time display has changed enough
+    percentChanged = abs(percentComplete - lastPercent) >= precision;
+    timeDisplayChanged = floor(currentTime) ~= lastTimeDisplay;
 
-    % Calculate estimated time remaining
-    progress_ratio = index / total;
-    if progress_ratio > 0
-        totalEstimatedSecs = elapsedSecs / progress_ratio;
-        remainingSecs = totalEstimatedSecs - elapsedSecs;
+    if ~percentChanged && ~timeDisplayChanged
+        % Neither percentage nor time display has changed enough
+        return;
+    end
+
+    % Erase previous line using backspace characters
+    eraseStr = repmat('\b', 1, lastPrintedLength);
+    fprintf(eraseStr);
+
+    % Compute estimated remaining time
+    if index > 0
+        estimatedTotalTime = currentTime * total / index;
+        remainingTime = estimatedTotalTime - currentTime;
     else
-        remainingSecs = 0;
+        remainingTime = Inf;
     end
 
-    % Convert remaining seconds to hours, minutes, seconds
-    remHours = floor(remainingSecs / 3600);
-    remMinutes = floor(mod(remainingSecs, 3600) / 60);
-    remSeconds = floor(mod(remainingSecs, 60));
+    % Format elapsed time
+    elapsedTimeStr = formatTime(currentTime);
 
-    % Format elapsed time string
-    if hours > 0
-        timeStr = sprintf('[Elapsed %02d:%02d:%02d', hours, minutes, seconds);
-    elseif minutes > 0
-        timeStr = sprintf('[Elapsed %02d:%02d', minutes, seconds);
-    else
-        timeStr = sprintf('[Elapsed %d s', seconds);
-    end
+    % Format remaining time
+    remainingTimeStr = formatTime(remainingTime);
 
-    % Format remaining time string
-    if remHours > 0
-        timeStr = sprintf('%s, Remaining %02d:%02d:%02d]', timeStr, remHours, remMinutes, remSeconds);
-    elseif remMinutes > 0
-        timeStr = sprintf('%s, Remaining %02d:%02d]', timeStr, remMinutes, remSeconds);
-    else
-        timeStr = sprintf('%s, Remaining %d s]', timeStr, remSeconds);
-    end
+    % Build the display string
+    displayStr = sprintf('%s %.2f percent [Elapsed %s, Remaining %s]', msg, percentComplete, elapsedTimeStr, remainingTimeStr);
 
-    % Calculate current percentage
-    currentPercentage = (index / total) * 100;
+    % Print the new progress line
+    fprintf('%s', displayStr);
 
-    % Check if either percentage or time string has changed
-    % AND at least 0.1 seconds have elapsed since the last update
-    if (abs(currentPercentage - lastPercentage) >= 0.01 || elapsedSecs == floor(elapsedSecs)) || index == 1 || index == total
-        if index > 1
-            % Calculate number of backspaces: length of previous string + '%% ' (2 chars)
-            numBackspaces = length(str) + 2 + length(lastTimeStr);
-            fprintf(repmat('\b', 1, numBackspaces));
-        end
-        
-        % Update the progress string
-        str = sprintf('%s %.2f', msg, currentPercentage);
-        fprintf([str, '%% ', timeStr]);
-        
-        % Update the persistent variables
-        lastTimeStr = timeStr;
-        lastPercentage = currentPercentage;
-        lastUpdateTime = elapsedSecs; % Update the last update time
-    end
+    % Update the last printed length
+    lastPrintedLength = length(displayStr);
 
-    % Print a newline when the process is complete
+    % Update persistent variables
+    lastUpdateTime = currentTime;
+    lastPercent = percentComplete;
+    lastTimeDisplay = floor(currentTime);
+
+    % If the loop is complete, print a new line and reset
     if index == total
         fprintf('\n');
+        % Reset persistent variables for the next use
+        lastUpdateTime = [];
+        lastPercent = [];
+        lastTimeDisplay = [];
+        lastPrintedLength = [];
+        startTime = [];
+    end
+
+    function timeStr = formatTime(t)
+        % Formats time according to specified rules
+        % t is in seconds
+        if t < 10
+            timeStr = sprintf('%d s', floor(t));
+        elseif t < 60
+            timeStr = sprintf('%02d s', floor(t));
+        elseif t < 3600
+            minutes = floor(t / 60);
+            seconds = floor(mod(t, 60));
+            timeStr = sprintf('%02d:%02d', minutes, seconds);
+        else
+            hours = floor(t / 3600);
+            minutes = floor(mod(t, 3600) / 60);
+            seconds = floor(mod(t, 60));
+            timeStr = sprintf('%02d:%02d:%02d', hours, minutes, seconds);
+        end
     end
 end

@@ -31,7 +31,7 @@ function [deltaQs, Qs, Deltas] = deltaQ(thetaR, thetaF, varR, varF, both)
     % Licensed under the MIT License (see LICENSE file for full details).
 
     if nargin < 5
-        both = 0;  % Default: consider XOR detection
+        both = false;  % Default: consider XOR detection
     end
 
     if(~iscell(thetaR))
@@ -61,7 +61,7 @@ function [deltaQs, Qs, Deltas] = deltaQ(thetaR, thetaF, varR, varF, both)
         % Concatenate the random parameters into a single array
         thetaR = [thetaR{:}];
 
-        n = length(Deltas);  % Number of samples
+        n = size(thetaR,1);  % Number of samples
 
         % Initialize output arrays for the error and detection probabilities
         deltaQs = zeros(n, 2 * Nl);

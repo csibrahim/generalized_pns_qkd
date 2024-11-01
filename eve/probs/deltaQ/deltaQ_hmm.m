@@ -28,7 +28,7 @@ function [deltaQs, Qs] = deltaQ_hmm(thetaA, thetaB, thetaE, both)
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
     % Licensed under the MIT License (see LICENSE file for full details).
 
-    if nargin < 5
+    if nargin < 4
         both = false;  % Default: consider XOR detection
     end
 

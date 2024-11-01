@@ -23,7 +23,7 @@ variables = {'lambdas','alpha','dAB', ...
 file_path = 'saved_data/experiment5_eve_iid'; 
 
 % Set to 'true' to load data, 'false' to save after computation
-loadData = true;
+loadData = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -32,6 +32,7 @@ loadData = true;
 % Pulse options
 N = 1e8;     % Number of pulses in each simulation run
 Nl = 9;      % Number of intensity levels (lambdas)
+limit = 10;  % Maximum intensity
 
 varR = {'dAE', 'pEB', 'k', 'Delta'};           % Random variables
 varF = setdiff(variables, varR, 'stable');     % Fixed variables
@@ -79,7 +80,7 @@ alpha = 0.21;     % Attenuation coefficient in channel
 dAB = 100;        % Distance between Alice and Bob (in km)
 
 % Get optimal intensity levels
-lambdas = getLambdas(Nl, alpha, dAB, thetaB);
+lambdas = getLambdas(Nl, alpha, dAB, thetaB, limit);
 
 % Group Alice's parameters
 thetaA = {lambdas, alpha, dAB}; 
@@ -114,8 +115,10 @@ thetas = {thetaA, thetaB, thetaE};
 
 if (~loadData)
     % Simulate the session
-    [C, D0, D1, l, a, b, x, e, sample_thetas] = simulate(N, thetas, varR, ...
-                                                         'noise', noise);
+    [D0, D1, l, a, b, x, e, sample_thetas] = simulate(N, thetas, varR, ...
+                                                      'noise', noise);
+    % Count clicks for different basis match/non-match cases
+    C = countClicks(Nl, D0, D1, l, a, b);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Process and Get Prior Parameters

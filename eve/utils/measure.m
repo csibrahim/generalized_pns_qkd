@@ -66,8 +66,8 @@ function [m, M, both] = measure_m(Nl, D0, D1, l, x)
     
     % Loop through each intensity level and compute the statistics
     for i = 1:Nl
-        M(i) = sum(xor_clicks & l == i);          % Total number of XOR clicks
-        m(i) = sum(xor_clicks & l == i & errors);  % Total number of errors
-        both(i) = sum(and_clicks & l == i);        % Total number of AND clicks
+           M(i) = sum(xor_clicks & l == i);           % Total number of XOR clicks
+           m(i) = sum(xor_clicks & l == i & errors);  % Total number of errors
+        both(i) = sum(and_clicks & l == i);           % Total number of AND clicks
     end
 end

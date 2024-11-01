@@ -26,8 +26,9 @@ loadData = false;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Pulse options
-N = 1e8;          % Number of pulses in each simulation run
-Nl = 9;           % Number of intensity levels (lambdas)
+N = 1e8;    % Number of pulses in each simulation run
+Nl = 9;     % Number of intensity levels (lambdas)
+limit = 10; % Maximum intensity
 
 % Get LaTeX-formatted labels
 param_labels = {'$d_{\mathrm{AE}}$','$p_{\mathrm{EB}}$','$k$','$\Delta$'};
@@ -72,7 +73,7 @@ alpha = 0.21; % Attenuation coefficient in channel
 dAB = 100;    % Distance between Alice and Bob (in km)
 
 % Get optimal intensity levels
-lambdas = getLambdas(Nl, alpha, dAB, thetaB);
+lambdas = getLambdas(Nl, alpha, dAB, thetaB, limit);
 
 % Group Alice's parameters
 thetaA = {lambdas, alpha, dAB}; 
@@ -111,8 +112,11 @@ thetaP = {alphas,betas,ub,lb};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if(~loadData)
-
-    [C, D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE);
+    % Simulate session data
+    [D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE);
+    
+    % Count clicks for different basis match/non-match cases
+    C = countClicks(Nl, D0, D1, l, a, b);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Maximum a posteriori probability (MAP) estimation through optimizaton

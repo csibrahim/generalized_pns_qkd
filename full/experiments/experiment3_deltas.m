@@ -30,8 +30,8 @@ N = 1e9;  % Number of pulses in each session simulation run
 % Define variable sets for the theoretical model
 varF = {'lambdas', 'alpha', ...
         'pa0', 'pa1', 'pc0', 'pc1', 'pd0', 'pd1', 'pe', ...
-        'dAE', 'k', 'Delta'}; % Fixed variables
-varR = {'dAB', 'pEB'};        % Random variables
+        'pEB', 'k', 'Delta'}; % Fixed variables
+varR = {'dAB', 'dAE'};        % Random variables
 
 % Variance options
 noise = 0;  % noise to add during simulation
@@ -85,8 +85,8 @@ pABs = dist2prob(dABs, alpha);   % Calculate probability of transmission over di
 
 % Define fixed parameter sets for Alice and Eve
 thetaA = {mu, alpha};
-thetaE = {0, 0, 0};
-thetaR = {dABs, pABs};
+thetaE = {1, 0, 0};
+thetaR = {dABs, dABs};
 
 hold on;
 n_pa = length(pas);
@@ -173,9 +173,9 @@ else
             thetas = {thetaA, thetaB, thetaE};
 
             % Run simulation and calculate observed probabilities
-            [~, D0, D1, l, a, b, x] = simulate(N, thetas, varR, ...
-                                              'match', true, ...
-                                              'noise', noise);
+            [D0, D1, l, a, b, x] = simulate(N, thetas, varR, ...
+                                            'match', true, ...
+                                            'noise', noise);
 
             [m, M, both] = measure(Nl, D0, D1, l, a, b, x);
 

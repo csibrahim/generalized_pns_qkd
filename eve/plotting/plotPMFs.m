@@ -31,7 +31,7 @@ function plotPMFs(N, p, epsilon, data, rows, row, cols, col, FontSize)
     Nl = size(data,2);
 
     % Generate labels for lambda parameters
-    labels = arrayfun(@(x) sprintf('\\lambda_{%d}', x), 1:Nl, 'UniformOutput', false);
+    labels = arrayfun(@(x) sprintf('$\\lambda_{%d}$', x), 1:Nl, 'UniformOutput', false);
 
     % Compute confidence intervals
     lowers = binoinv(epsilon, N, p);
@@ -61,21 +61,37 @@ function plotPMFs(N, p, epsilon, data, rows, row, cols, col, FontSize)
         n = from:to;
         pmf = binopdf(n, N, p(i));
 
-        h_hist = histogram(data(:,i), 'Normalization', 'pdf', 'FaceColor', 'w', 'FaceAlpha', 1, 'LineWidth', line_width);
-        plot(n, pmf, 'o', 'MarkerSize', marker_size, 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'none');
+        h_hist = histogram(data(:,i), ...
+                           'Normalization', 'pdf', ...
+                           'FaceColor', 'w', ....
+                           'FaceAlpha', 1, ...
+                           'LineWidth', line_width...
+                           );
+
+        plot(n, pmf, 'o', ...
+             'MarkerSize', marker_size, ...
+             'MarkerFaceColor', 'k', ...
+             'MarkerEdgeColor', 'none');
         
         max_y = max([h_hist.Values pmf]) * 1.1;
         ylim([0 max_y]);
         xlim([from-0.5 to+0.5]);
 
         % Set tick labels and font sizes
-        set(gca, 'TickLabelInterpreter', 'latex', 'FontSize', tickFontSize);
+        set(gca, ...
+            'TickLabelInterpreter', 'latex', ...
+            'FontSize', tickFontSize...
+            );
+
         ax = gca;
         ax.YAxis.FontSize = tickFontSize;
         ax.XAxis.FontSize = tickFontSize;
 
         % X labels: Show parameter labels on the bottom row
-        xlabel(['$', labels{i}, '$'], 'Interpreter', 'latex', 'FontSize', legendFontSize);
+        xlabel(['$', labels{i}, '$'], ...
+               'Interpreter', 'latex', ...
+               'FontSize', legendFontSize ...
+               );
 
         % Get the current x-tick values
         currentXTicks = xticks;

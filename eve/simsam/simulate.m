@@ -1,4 +1,4 @@
-function [C, D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE, varargin)
+function [D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE, varargin)
     %simulate: Simulates the detection events for quantum key distribution (QKD) 
     %          under a generalized PNS attack
     %
@@ -16,7 +16,6 @@ function [C, D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE, vararg
     %                  'print'   - Print progress (default: true)
     %
     % Outputs:
-    %     C              - Click counts categorized by matching/non-matching basis choices
     %     D0             - Logical array indicating detection events at detector D0
     %     D1             - Logical array indicating detection events at detector D1
     %     l              - Intensity index for each pulse
@@ -53,11 +52,11 @@ function [C, D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE, vararg
     % Preallocate detection event arrays
     D0 = false(1, N);  % Detection events at detector D0
     D1 = false(1, N);  % Detection events at detector D1
-    x = false(1, N);   % Alice's bit choice (0 or 1)
-    a = false(1, N);   % Alice's basis choice (0 or 1)
-    b = false(1, N);   % Bob's basis choice (0 or 1)
-    e = false(1, N);   % Eve's interception flag (1 if intercepted, 0 otherwise)
-    l = zeros(1, N);   % Intensity index for each pulse
+     x = false(1, N);   % Alice's bit choice (0 or 1)
+     a = false(1, N);   % Alice's basis choice (0 or 1)
+     b = false(1, N);   % Bob's basis choice (0 or 1)
+     e = false(1, N);   % Eve's interception flag (1 if intercepted, 0 otherwise)
+     l = zeros(1, N);   % Intensity index for each pulse
 
     num_chunks = ceil(N / buffer);
 
@@ -100,13 +99,15 @@ function [C, D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE, vararg
         n1 = ns - n0;          % Photons in path 1
 
         % Simulate dark counts and detector clicks for both detectors
-        dark0 = rand(1, chunk_size) < pd0;  % Dark counts at detector D0
-        signal0 = rand(1, chunk_size) < 1 - (1 - pc0).^n0;  % Detection at D0
-        D0(first:last) = dark0 | signal0;  % Combine dark counts and signal detection
+        d0 = binornd(1,pd0);   % Dark counts at detector D0
+        s0 = binornd(n0,pc0);  % Detection at D0
 
-        dark1 = rand(1, chunk_size) < pd1;  % Dark counts at detector D1
-        signal1 = rand(1, chunk_size) < 1 - (1 - pc1).^n1;  % Detection at D1
-        D1(first:last) = dark1 | signal1;  % Combine dark counts and signal detection
+        D0(first:last) = d0 | (s0 > 0);  % Combine dark counts and signal detection
+
+        d1 = binornd(1,pd1);  % Dark counts at detector D1
+        s1 = binornd(n1,pc1); % Detection at D1
+        
+        D1(first:last) = d1 | (s1 > 0);  % Combine dark counts and signal detection
 
         % Display progress
         if print
@@ -141,7 +142,5 @@ function [C, D0, D1, l, a, b, x, e] = simulate(N, thetaA, thetaB, thetaE, vararg
             end
         end
     end
-
-    % Count clicks for different basis match/non-match cases
-    C = countClicks(Nl, D0, D1, a, b, l);
+    
 end

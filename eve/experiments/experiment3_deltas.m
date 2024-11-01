@@ -19,7 +19,7 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 file_path = 'saved_data/experiment3_deltas';
 
 % Set to 'true' to load data, 'false' to save after computation
-loadData = true;
+loadData = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -75,8 +75,6 @@ dABs = (0:plot_spacing:dAB)';
 pABs = dist2prob(dABs, alpha);   % Calculate probability of transmission over distance
 
 
-
-
 hold on;
 n_pa = length(pas);
 
@@ -99,7 +97,7 @@ for i = 1:n_pa
 
         thetaA = {mu, alpha, dABs(j)};
         thetaB = {pas(i), pas(i), pc, pc, pd, pd, pe};
-        thetaE = {0, pABs(j), 0, 0};
+        thetaE = {dABs(j), 1, 0, 0};
         [deltaQij, Qij] = deltaQ(thetaA, thetaB, thetaE, true);
 
         Qs{i + 1}(j) = 2 * Qij(2);
@@ -170,8 +168,8 @@ else
             thetaE = {dABs(i), 1, 0, 0};
 
             % Run simulation and calculate observed probabilities
-            [~, D0, D1, l, a, b, x] = simulate(N, thetaA, thetaB, thetaE, ...
-                                              'match', true);
+            [D0, D1, l, a, b, x] = simulate(N, thetaA, thetaB, thetaE, ...
+                                            'match', true);
 
             [m, M, both] = measure(Nl, D0, D1, l, a, b, x);
 

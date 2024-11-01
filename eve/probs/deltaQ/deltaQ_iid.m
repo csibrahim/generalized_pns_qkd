@@ -28,7 +28,7 @@ function [deltaQs, Qs] = deltaQ_iid(thetaA, thetaB, thetaE, both)
     %   deltaQs - Error probabilities for each intensity and configuration
     %   Qs      - Detection probabilities for each intensity and configuration
     
-    if nargin < 5
+    if nargin < 4
         both = false;  % Default: consider XOR detection
     end
 

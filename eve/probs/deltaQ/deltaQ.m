@@ -32,7 +32,7 @@ function [deltaQs, Qs, Deltas] = deltaQ(thetaA, thetaB, thetaE, both)
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
     % Licensed under the MIT License (see LICENSE file for full details).
 
-    if nargin < 5
+    if nargin < 4
         both = false;  % Default: consider XOR detection
     end
 
@@ -57,7 +57,7 @@ function [deltaQs, Qs, Deltas] = deltaQ(thetaA, thetaB, thetaE, both)
     if any(pa > 0)
         % HMM case
 
-        n = length(Deltas);  % Number of samples
+        n = size(thetaE,1);  % Number of samples
 
         % Initialize output arrays for the error and detection probabilities
         deltaQs = zeros(n, 2 * Nl);

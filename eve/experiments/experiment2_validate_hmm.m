@@ -19,7 +19,7 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 file_path = 'saved_data/experiment2_validate_hmm'; 
 
 % Set to 'true' to load data, 'false' to save after computation
-loadData = true;
+loadData = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -30,6 +30,7 @@ runs = 1e4; % Total number of simulation runs
 % Pulse options
 N = 1e4;    % Number of pulses in each simulation run
 Nl = 2;     % Number of intensity levels (lambdas)
+limit = 10; % Maximum intensity
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bob's Parameters
@@ -57,7 +58,7 @@ alpha = 0.21; % Attenuation coefficient in the channel
 dAB = 50;     % Distance between Alice and Bob (in km)
 
 % Get optimal intensity levels
-lambdas = getLambdas(Nl, alpha, dAB, thetaB);
+lambdas = getLambdas(Nl, alpha, dAB, thetaB, limit);
 
 % Group Alice's parameters
 thetaA = {lambdas, alpha, dAB}; 
@@ -107,9 +108,13 @@ if(~loadData)
     for i = 1:runs
         
         % Simulate pulses and measure detection events
-        [C(i,:), D0, D1, l, a, b, x] = simulate(N, thetaA, thetaB, thetaE, ...
-                                               'print', false);
+        [D0, D1, l, a, b, x] = simulate(N, thetaA, thetaB, thetaE, ...
+                                        'print', false);
 
+        % Count clicks for different basis match/non-match cases
+        C(i,:) = countClicks(Nl, D0, D1, l, a, b);
+
+        % Count signal and error clicks
         [m(i,:), M(i,:), both(i,:)] = measure(Nl, D0, D1, l, a, b, x);
     
         progress(i, runs, 'simulating sessions');

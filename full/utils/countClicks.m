@@ -1,4 +1,4 @@
-function C = countClicks(Nl, D0, D1, a, b, l)
+function C = countClicks(Nl, D0, D1, l, a, b)
     %countClicks: This function counts the occurrences of different detection 
     %              click events (no clicks, clicks on D0, clicks on D1, and clicks 
     %              on both) across `Nl` pulse intensities for both matching and 
@@ -8,9 +8,9 @@ function C = countClicks(Nl, D0, D1, a, b, l)
     %     Nl  - Number of pulse intensities
     %     D0  - Detection event at detector 0 (binary)
     %     D1  - Detection event at detector 1 (binary)
+    %     l   - Intensity level of each pulse
     %     a   - Alice's basis choice (binary)
     %     b   - Bob's basis choice (binary)
-    %     l   - Intensity level of each pulse
     %
     % Outputs:
     %     C   - A 1 x (8 * Nl) array that contains the counts of each detection
