@@ -154,7 +154,7 @@ ax.XAxis.MinorTickValues = minorTick:minorTick:dAB;
 
 if savePlots
     fprintf('Saving the plot ...\n');
-    print('figures/key_rates', '-dsvg');
+    print('figures/key_rates', '-dpdf');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

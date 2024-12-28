@@ -193,8 +193,8 @@ EQs_iid_plot = gcf;
 
 if savePlots
     fprintf('Saving plots ...\n');
-    print(Ps_hmm_plot, 'figures/validate_hmm_Ps', '-dsvg');
-    print(Ps_iid_plot, 'figures/validate_hmm_Ps_with_iid', '-dsvg');
-    print(EQs_hmm_plot, 'figures/validate_hmm_EQs', '-dsvg');
-    print(EQs_iid_plot, 'figures/validate_hmm_EQs_with_iid', '-dsvg');
+    print(Ps_hmm_plot, 'figures/validate_hmm_Ps', '-dpdf');
+    print(Ps_iid_plot, 'figures/validate_hmm_Ps_with_iid', '-dpdf');
+    print(EQs_hmm_plot, 'figures/validate_hmm_EQs', '-dpdf');
+    print(EQs_iid_plot, 'figures/validate_hmm_EQs_with_iid', '-dpdf');
 end

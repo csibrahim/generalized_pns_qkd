@@ -184,6 +184,6 @@ Ks_plot = gcf;
 
 if savePlots
     fprintf('Saving plots ...\n');
-    print(params_plot, 'figures/eve_iid_params', '-dsvg');
+    print(params_plot, 'figures/eve_iid_params', '-dpdf');
     print(Ks_plot, 'figures/eve_iid_Ks', '-dsvg');
 end

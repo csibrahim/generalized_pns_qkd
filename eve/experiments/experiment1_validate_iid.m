@@ -198,7 +198,7 @@ decoy_plot = gcf;
 
 if savePlots
     fprintf('Saving plots ...\n');
-    print(Ps_plot, 'figures/validate_iid_Ps', '-dsvg');
-    print(EQs_plot, 'figures/validate_iid_EQs', '-dsvg');
-    print(decoy_plot, 'figures/validate_iid_decoy', '-dsvg');
+    print(Ps_plot, 'figures/validate_iid_Ps', '-dpdf');
+    print(EQs_plot, 'figures/validate_iid_EQs', '-dpdf');
+    print(decoy_plot, 'figures/validate_iid_decoy', '-dpdf');
 end

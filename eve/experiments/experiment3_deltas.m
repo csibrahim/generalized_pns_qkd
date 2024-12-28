@@ -291,5 +291,5 @@ end
 
 if savePlots
     fprintf('Saving the plot ...\n');
-    print('figures/error_rates', '-dsvg');
+    print('figures/error_rates', '-dpdf');
 end

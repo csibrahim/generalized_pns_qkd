@@ -222,9 +222,9 @@ eve_iid_Ks_plot = gcf;
 
 if savePlots
     fprintf('Saving plots ...\n');
-    print(eve_hmm_params_plot, 'figures/eve_hmm_params', '-dsvg');
-    print(eve_iid_params_plot, 'figures/eve_hmm_params_with_iid', '-dsvg');
+    print(eve_hmm_params_plot, 'figures/eve_hmm_params', '-dpdf');
+    print(eve_iid_params_plot, 'figures/eve_hmm_params_with_iid', '-dpdf');
 
-    print(eve_hmm_Ks_plot, 'figures/eve_hmm_Ks', '-dsvg');
-    print(eve_iid_Ks_plot, 'figures/eve_hmm_Ks_with_iid', '-dsvg');
+    print(eve_hmm_Ks_plot, 'figures/eve_hmm_Ks', '-dpdf');
+    print(eve_iid_Ks_plot, 'figures/eve_hmm_Ks_with_iid', '-dpdf');
 end
