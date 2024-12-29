@@ -28,7 +28,7 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 
 FigureWidth = 1200;        % Width of the figure in points
 FontSize = 24;             % Font size for plot labels and text
-aspectRatio = 1/3;         % Ratio of height/width
+aspectRatio = 2/5;         % Ratio of height/width
 plot_spacing = 0.1;        % Spacing in km for theoretical distance calculations
 majorTick = 10;            % Major-ticks spacing
 minorTick = 5;             % Minor-ticks spacing
