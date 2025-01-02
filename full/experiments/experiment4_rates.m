@@ -66,7 +66,7 @@ x_label = 'Distance in km';
 y_label = '$K$ ';
 prepFigure(FigureWidth, aspectRatio, FontSize, x_label, y_label);
 
-lineWidth = FigureWidth / 400;
+lineWidth = FigureWidth / 500;
 
 hold on;
 
