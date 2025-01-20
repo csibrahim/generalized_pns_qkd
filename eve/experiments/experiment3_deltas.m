@@ -28,12 +28,18 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 % Plotting Options
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FigureWidth = 1200;  % Width of the figure in points
-FontSize = 24;       % Font size for plot labels and text
-CIp = 0.99;          % Confidence interval threshold
-aspectRatio = 1/3;   % Ratio of height/width
-plot_spacing = 1;    % Spacing in km for theoretical distance calculations   
-sample_spacing = 5;  % Spacing in km for simulation data points
+scale = 2;                    % Factor scaling for screen readability
+FigureWidth = 180;            % Width of the figure in mm
+FontSize = 8;                 % Font size for plot labels and text
+FontName = 'Times New Roman'; % Font name for plot labels and text
+CIp = 0.99;                   % Confidence interval threshold
+aspectRatio = 1/3;            % Ratio of height/width
+plot_spacing = 1;             % Spacing in km for theoretical distances
+sample_spacing = 5;           % Spacing in km for simulation data points
+
+% Scale the figure size and font
+FigureWidth = FigureWidth * scale;
+FontSize = FontSize * scale;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -64,12 +70,12 @@ dAB = 150;          % Maximum distance between Alice and Bob in km
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 x_label = 'Distance in km';
-y_label = '$\delta$ ';
+y_label = 'δ ';
 
-prepFigure(FigureWidth, aspectRatio, FontSize, x_label, y_label);
+prepFigure(FigureWidth, aspectRatio, FontSize, FontName, x_label, y_label);
 
-lineWidth = FigureWidth / 400;
-markerSize = FigureWidth / 150;
+lineWidth = FigureWidth / 100;
+markerSize = FigureWidth / 50;
 
 hold on;
 
@@ -151,14 +157,14 @@ for i = 1:numel(Qs)
 
     % Place a label at the end of each line
     if i == 1
-        lineLabel = {'Decoy', '($p_{a}$=\,0\%)'};
+        lineLabel = {'Decoy', '(p_{a} = 0%)'};
     else
-        lineLabel = ['$p_{a}$=\,', num2str(100 * pas(i - 1)), '\%'];
+        lineLabel = ['p_{a}= ', num2str(100 * pas(i - 1)), '%'];
     end
 
     text(max(dABs) * 1.01, E_rho(end), lineLabel, ...
-         'Interpreter', 'latex', ...
-         'FontSize', FontSize);
+         'FontSize', FontSize, ...
+         'FontName', FontName);
 end
 
 % Define colors for each after-pulsing probability and initialize plot handles
@@ -173,9 +179,9 @@ for j = 1:n_pa
 end
 
 % Configure legend labels
-CI_legend = {['$\mathrm{CI}_{', num2str(100*CIp), '\%}$']};
+CI_legend = {['CI(', num2str(100*CIp), '%)']};
 E_legend = {'Expected Value'};
-data_legends = arrayfun(@(x) sprintf('$%d\\%%$', x), 100 * pas, 'UniformOutput', false);
+data_legends = arrayfun(@(x) sprintf('%d%%', x), 100 * pas, 'UniformOutput', false);
 
 % Configure legends handles
 handles = [h_CI, h_E, h_data{:}];
@@ -185,8 +191,8 @@ legends = [CI_legend, E_legend, data_legends(:)'];
 legend(handles, legends, ...
        'Location', 'northoutside', ...
        'Orientation', 'horizontal', ...
-       'Interpreter', 'latex', ...
-       'FontSize', FontSize);
+       'FontSize', FontSize, ...
+       'FontName', FontName);
 
 % Remove padding around the axes, but leave 10% to the east for legends
 set(gca, 'LooseInset', [0, 0, 0.1, 0]);

@@ -14,22 +14,29 @@
 seed = 1;
 
 % File path for loading/saving results (can be empty [])
-file_path = 'demo_data'; 
+file_path = 'demo_data';
 
 loadData = false;    % Set to 'true' to load data, 'false' to save after computation
 savePlots = true;    % Set to 'true' to save plots
 
 rng(seed);                 % Set the random seed
-restoredefaultpath; clear; % Restore default path and clear workspace
+restoredefaultpath;        % Restore default path and clear workspace
 addpath(genpath('.'));     % Add all subfolders to the search path
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plotting Options
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FigureWidth = 1200;  % Width of the figure in points
-FontSize = 24;       % Font size for plot labels and text
-CIp = 0.99;          % Confidence interval threshold
+scale = 2;                    % Factor scaling for screen readability
+FigureWidth = 180;              % Width of the figure in mm
+FontSize = 8;                   % Font size for plot labels and text
+FontName = 'Times New Roman';   % Font name for plot labels and text
+CIp = 0.99;                     % Confidence interval threshold
+
+% Scale the figure size and font
+FigureWidth = FigureWidth * scale;
+FontSize = FontSize * scale;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -169,6 +176,9 @@ if (~loadData)
                      C, varR, varF, thetaF, thetaP, ...
                      'ground_truth', thetaR, ...
                      'display', display, ...
+                     'FontSize', FontSize, ...
+                     'FontName', FontName, ...
+                     'FigureWidth', FigureWidth, ...
                      'labels', param_labels, ...
                      'chunkSize', chunkSize);
 
@@ -221,6 +231,7 @@ end
                                                                   'labels', param_labels, ...
                                                                   'CIp', CIp, ...
                                                                   'FontSize', FontSize, ...
+                                                                  'FontName', FontName, ...
                                                                   'FigureWidth', FigureWidth);
 params_plot = gcf;
 
@@ -230,6 +241,7 @@ params_plot = gcf;
                                                     'labels', K_labels, ...
                                                     'CIp', CIp, ...
                                                     'FontSize', FontSize, ...
+                                                    'FontName', FontName, ...
                                                     'FigureWidth', FigureWidth);
 
 Ks_plot = gcf;

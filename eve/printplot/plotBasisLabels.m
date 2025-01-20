@@ -1,22 +1,25 @@
-function plotBasisLabels(blocks, FontSize)
+function plotBasisLabels(blocks, FontSize, FontName)
     %plotBasisLabels: Adds 'a≠b' and 'a=b' labels below tiles to indicate 
     %                 matching and non-matching bases in a subplot grid.
     %
     % Inputs:
     %   blocks    - Width of a tile in blocks
     %   FontSize  - Font size for the labels (points)
+    %   FontName  - Name of the font for labels and text
     %
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
     % Licensed under the MIT License (see LICENSE file for full details).
 
     % Define labels for bases match cases
-    bases_labels = {'$a\neq b$', '$a=b$'};
+    % bases_labels = {'a ≠ b', 'a = b'};
+    bases_labels = {'Non-matching Bases (a ≠ b)', 'Matching Bases (a = b)'};
     
     for i=1:numel(bases_labels)
         
         % Create a tile spanning 2*blocks in width
         nexttile([1,2*blocks]);
 
+        hold on;
         % Draw a line separator
         plot([0 1], [1 1], 'k-');
         
@@ -24,9 +27,9 @@ function plotBasisLabels(blocks, FontSize)
         text(0.5, 0.5, bases_labels{i}, ...
         'HorizontalAlignment', 'center', ...
         'VerticalAlignment', 'top', ...
-        'Interpreter', 'latex', ...
         'Units', 'normalized', ...
-        'FontSize', FontSize);
+        'FontSize', FontSize, ...
+        'FontName', FontName);
 
         % Set axes limits to ensure label fits
         xlim([0 1]);

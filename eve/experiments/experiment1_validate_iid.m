@@ -27,9 +27,15 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 % Plotting Options
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FigureWidth = 800;   % Width of the figure in points
-FontSize = 16;       % Font size for plot labels and text
-CIp = 0.99;          % Confidence interval threshold
+scale = 1.5;                    % Factor scaling for screen readability
+FigureWidth = 180;              % Width of the figure in mm
+FontSize = 8;                   % Font size for plot labels and text
+FontName = 'Times New Roman';   % Font name for plot labels and text
+CIp = 0.99;                     % Confidence interval threshold
+
+% Scale the figure size and font
+FigureWidth = FigureWidth * scale;
+FontSize = FontSize * scale;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -187,7 +193,10 @@ plotEQ(N, R(:, Nl+1:end), S(:, Nl+1:end), EQs_decoy, Qs_decoy, ...
        'split', false, ...
        'FigureWidth', FigureWidth/2, ...
        'FontSize', FontSize, ...
-       'CIp', CIp);
+       'CIp', CIp, ...
+       'EQs_ref', EQs_decoy, ...
+       'Qs_ref', Qs_decoy, ...
+       'LegendName', {'Proposed', 'Decoy'});
 
 set(gcf, 'Name', 'Gain/Error - Decoy', 'NumberTitle', 'off');
 decoy_plot = gcf;

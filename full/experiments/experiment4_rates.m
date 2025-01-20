@@ -26,12 +26,18 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 % Display options
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FigureWidth = 1200;        % Width of the figure in points
-FontSize = 24;             % Font size for plot labels and text
-aspectRatio = 2/5;         % Ratio of height/width
-plot_spacing = 0.1;        % Spacing in km for theoretical distance calculations
-majorTick = 10;            % Major-ticks spacing
-minorTick = 5;             % Minor-ticks spacing
+scale = 2;                    % Factor scaling for screen readability
+FigureWidth = 180 ;           % Width of the figure in mm
+FontSize = 8;                 % Font size for plot labels and text
+FontName = 'Times New Roman'; % Font name for plot labels and text
+aspectRatio = 2/5;            % Ratio of height/width
+plot_spacing = 0.1;           % Spacing in km for theoretical distances
+majorTick = 10;               % Major-ticks spacing
+minorTick = 5;                % Minor-ticks spacing
+
+% Scale the figure size and font
+FigureWidth = FigureWidth * scale;
+FontSize = FontSize * scale;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bob's Parameters
@@ -63,10 +69,10 @@ mus = [1 5 10];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 x_label = 'Distance in km';
-y_label = '$K$ ';
-prepFigure(FigureWidth, aspectRatio, FontSize, x_label, y_label);
+y_label = 'K ';
+prepFigure(FigureWidth, aspectRatio, FontSize, FontName, x_label, y_label);
 
-lineWidth = FigureWidth / 500;
+lineWidth = FigureWidth / 200;
 
 hold on;
 
@@ -106,10 +112,10 @@ for i = 1:Nl
 end
 
 % Legend labels
-intensities_legends = arrayfun(@(x) sprintf('Proposed ($\\mu=$%d)', x), mus, 'UniformOutput', false);
-decoy_legend = {['Decoy ($\mu=', num2str(mu), '$)']};
-corrected_legend = {['Corrected Decoy ($\mu=', num2str(mu), '$)']};
-proposed_legend = {['Proposed ($\mu=', num2str(mu), '$)']};
+intensities_legends = arrayfun(@(x) sprintf('Proposed (\\mu = %d)', x), mus, 'UniformOutput', false);
+decoy_legend = {['Decoy (\mu = ', num2str(mu), ')']};
+corrected_legend = {['Corrected Decoy (\mu = ', num2str(mu), ')']};
+proposed_legend = {['Proposed (\mu = ', num2str(mu), ')']};
 
 % Legend handles
 legends = [decoy_legend, corrected_legend, proposed_legend, intensities_legends(:)'];
@@ -119,8 +125,8 @@ handles = [h_decoy, h_corrected, h_mu, h_lambdas{:}];
 legend(handles, legends, ...
        'Location', 'northoutside', ....
        'Orientation', 'horizontal', ....
-       'Interpreter', 'latex', ...
        'FontSize', FontSize, ...
+       'FontName', FontName, ...
        'NumColumns', 3);
 
 % Set the y-axis scale to logarithmic

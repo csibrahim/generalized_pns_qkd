@@ -27,9 +27,15 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 % Plotting Options
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FigureWidth = 800;   % Width of the figure in points
-FontSize = 16;       % Font size for plot labels and text
-CIp = 0.99;          % Confidence interval threshold
+scale = 1.5;                    % Factor scaling for screen readability
+FigureWidth = 180;              % Width of the figure in mm
+FontSize = 8;                   % Font size for plot labels and text
+FontName = 'Times New Roman';   % Font name for plot labels and text
+CIp = 0.99;                     % Confidence interval threshold
+
+% Scale the figure size and font
+FigureWidth = FigureWidth * scale;
+FontSize = FontSize * scale;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -155,27 +161,40 @@ end
 
 % Compute HMM detection probabilities and plot results
 Ps_hmm = P_hmm(thetaR, thetaF, varR, varF);
-plotPs(Ps_hmm, C);
-set(gcf, 'Name', 'Probabilities - HMM', 'NumberTitle', 'off');
-Ps_hmm_plot = gcf;
 
 % Compute i.i.d. detection probabilities and plot results
 Ps_iid = P_iid(thetaR, thetaF, varR, varF);
-plotPs(Ps_iid, C);
-set(gcf, 'Name', 'Probabilities - i.i.d.', 'NumberTitle', 'off');
-Ps_iid_plot = gcf;
+
+plotPs(Ps_hmm, C, ...
+         'FigureWidth', FigureWidth, ...
+         'FontSize', FontSize, ...
+         'FontName', FontName, ...
+         'CIp', CIp, ...
+         'Ps_ref', Ps_iid, ...
+         'LegendName', {'HMM', 'i.i.d'});
+
+set(gcf, 'Name', 'Probabilities - HMM vs i.i.d.', 'NumberTitle', 'off');
+Ps_plot = gcf;
+
 
 % Compute HMM error rates and gain, and visualize them
 [EQs_hmm, Qs_hmm] = EQ_hmm(thetaR, thetaF, varR, varF);
-plotEQ(N, R, S, EQs_hmm, Qs_hmm);
-set(gcf, 'Name', 'Gain/Error - HMM', 'NumberTitle', 'off');
-EQs_hmm_plot = gcf;
 
 % Compute i.i.d. error rates and gain, and visualize them
 [EQs_iid, Qs_iid] = EQ_iid(thetaR, thetaF, varR, varF);
-plotEQ(N, R, S, EQs_iid, Qs_iid);
-set(gcf, 'Name', 'Gain/Error - i.i.d.', 'NumberTitle', 'off');
-EQs_iid_plot = gcf;
+
+plotEQ(N, R, S, EQs_hmm, Qs_hmm, ...
+         'FigureWidth', FigureWidth, ...
+         'FontSize', FontSize, ...
+         'FontName', FontName, ...
+         'CIp', CIp, ...
+         'EQs_ref', EQs_iid, ...
+         'Qs_ref', Qs_iid, ...
+         'LegendName', {'HMM', 'i.i.d'});
+
+set(gcf, 'Name', 'Gain/Error - HMM vs i.i.d.', 'NumberTitle', 'off');
+EQs_plot = gcf;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Save Figures
@@ -183,8 +202,6 @@ EQs_iid_plot = gcf;
 
 if savePlots
     fprintf('Saving plots ...\n');
-    print(Ps_hmm_plot, 'figures/validate_hmm_Ps', '-dpdf');
-    print(Ps_iid_plot, 'figures/validate_hmm_Ps_with_iid', '-dpdf');
-    print(EQs_hmm_plot, 'figures/validate_hmm_EQs', '-dpdf');
-    print(EQs_iid_plot, 'figures/validate_hmm_EQs_with_iid', '-dpdf');
+    print(Ps_plot, 'figures/validate_hmm_Ps', '-dpdf');
+    print(EQs_plot, 'figures/validate_hmm_EQs', '-dpdf');
 end

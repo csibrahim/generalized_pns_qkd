@@ -5,8 +5,11 @@ function [thetaE_MAP, samples, Ks, K_theory] = post_process(C, params)
     % Inputs:
     %     C       - Observed click counts
     %     params  - Cell array of parameters containing:
-    %                 {thetaA, thetaB, thetaE, thetaP, algorithm, maxIters, 
-    %                  Ns, Nb, method, display, chunkSize}
+    %                 {thetaA, thetaB, thetaE, thetaP, 
+    %                  algorithm, maxIters,
+    %                  Ns, Nb, 
+    %                  FontSize, FontName, FigureWidth,
+    %                  method, display, chunkSize}
     %
     % Outputs:
     %     thetaE_MAP - MAP estimate of Eve's parameters
@@ -20,7 +23,9 @@ function [thetaE_MAP, samples, Ks, K_theory] = post_process(C, params)
     % Unpack parameters
     [thetaA, thetaB, thetaE, thetaP, ...
      algorithm, maxIters, ...
-     Ns, Nb, method, display, chunkSize] = deal(params{:});
+     Ns, Nb, ...
+     FontSize, FontName, FigureWidth, ...
+     method, display, chunkSize] = deal(params{:});
 
     lambdas = thetaA{1};  % Intensity levels
     Delta = thetaE{4};    % Fraction of intercepted pulses
@@ -44,7 +49,7 @@ function [thetaE_MAP, samples, Ks, K_theory] = post_process(C, params)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Generate LaTeX-formatted labels
-    param_labels = {'$d_{\mathrm{AE}}$', '$p_{\mathrm{EB}}$', '$k$', '$\Delta$'};
+    param_labels = {'d_{AE}', 'p_{EB}', 'k', '∆'};
 
     % Perform MCMC sampling for posterior distribution of Eve's parameters
     samples = sample(method, thetaE_MAP, Ns, Nb, ...
@@ -52,6 +57,9 @@ function [thetaE_MAP, samples, Ks, K_theory] = post_process(C, params)
                      'ground_truth', thetaE, ...
                      'display', display, ...
                      'labels', param_labels, ...
+                     'FontSize', FontSize, ...
+                     'FontName', FontName, ...
+                     'FigureWidth', FigureWidth, ...
                      'chunkSize', chunkSize);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

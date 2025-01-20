@@ -19,8 +19,9 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, thetaA, thetaB, 
     %                       'display'      - Boolean for progress display (default: true)
     %                       'labels'       - Labels for plotting (default: [])
     %                       'CIp'          - Confidence level (default: 0.99)
-    %                       'FontSize'     - Font size for labels and text (default: 24)
-    %                       'FigureWidth'  - Width of the figure in points (default: 1200)
+    %                       'FontSize'     - Font size for labels and text (default: 8)
+    %                       'FontName'     - Font size for labels (default: Times New Roman)
+    %                       'FigureWidth'  - Width of the figure in points (default: 180)
     %
     % Outputs:
     %     samples  - Sampled values for each parameter after burn-in
@@ -36,8 +37,9 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, thetaA, thetaB, 
     addParameter(p, 'display', true);
     addParameter(p, 'labels', []);
     addParameter(p, 'CIp', 0.99);
-    addParameter(p, 'FontSize', 24);
-    addParameter(p, 'FigureWidth', 1200);
+    addParameter(p, 'FontSize', 8);
+    addParameter(p, 'FontName', 'Times New Roman');
+    addParameter(p, 'FigureWidth', 180);
 
     % Parse input arguments
     parse(p, varargin{:});
@@ -49,6 +51,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, thetaA, thetaB, 
     labels = p.Results.labels;
     CIp = p.Results.CIp;
     FontSize = p.Results.FontSize;
+    FontName = p.Results.FontName;
     FigureWidth = p.Results.FigureWidth;
 
     % Total iterations, including burn-in
@@ -76,7 +79,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, thetaA, thetaB, 
         rows = ceil(sqrt(dim/4));
         cols = ceil(dim / rows);
         ratio = rows/cols;
-        f = prepFigure(FigureWidth, ratio);
+        f = prepFigure(FigureWidth, ratio, FontSize, FontName);
         set(f, 'KeyPressFcn', @keyPressCallback);
     end
 
@@ -135,6 +138,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, thetaA, thetaB, 
                                   'labels', labels, ...
                                   'CIp', CIp, ...
                                   'FontSize', FontSize, ...
+                                  'FontName', FontName, ...
                                   'FigureWidth', FigureWidth, ...
                                   'newFigure', false, ...
                                   'message', 'Press CTRL+C any time to stop the sampling process');

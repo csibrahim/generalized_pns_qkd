@@ -12,8 +12,9 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     %                 'labels'       - Variable labels (default: [])
     %                 'CIp'          - Confidence level (default: 0.99)
     %                 'numBins'      - Number of histogram bins (default: 50)
-    %                 'FontSize'     - Font size for labels (default: 24)
-    %                 'FigureWidth'  - Figure width in points (default: 1200)
+    %                 'FontSize'     - Font size for labels (default: 8)
+    %                 'FontName'     - Font size for labels (default: Times New Roman)
+    %                 'FigureWidth'  - Figure width in mm (default: 180)
     %                 'newFigure'    - Flag to create a new figure (default: true)
     %                 'message'      - Message to display (default: none)
     %
@@ -39,8 +40,9 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     addParameter(p, 'labels', []);
     addParameter(p, 'CIp', 0.99);
     addParameter(p, 'numBins', 50);
-    addParameter(p, 'FontSize', 24);
-    addParameter(p, 'FigureWidth', 1200);
+    addParameter(p, 'FontSize', 8);
+    addParameter(p, 'FontName', 'Times New Roman');
+    addParameter(p, 'FigureWidth', 180);
     addParameter(p, 'newFigure', true);
     addParameter(p, 'message', []);
 
@@ -55,6 +57,7 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     CIp = p.Results.CIp;
     numBins = p.Results.numBins;
     FontSize = p.Results.FontSize;
+    FontName = p.Results.FontName;
     FigureWidth = p.Results.FigureWidth;
     newFigure = p.Results.newFigure;
     message = p.Results.message;
@@ -64,7 +67,7 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     end
 
     % Adjust font size for tick labels
-    tickFontSize = 0.5 * FontSize;
+    tickFontSize = max((5 / 8) * FontSize, 5);
 
     % For CI calculation
     epsilon = (1 - CIp) / 2;
@@ -77,7 +80,7 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     % Legend labels
     label_mean = {'Mean'};
     label_KDE = {'KDE'};
-    label_CI = {['$\mathrm{CI}_{', num2str(100 * CIp), '\%}$']};
+    label_CI = {['CI(', num2str(100 * CIp), '%)']};
     label_ground_truth = [];
     
     if ~isempty(ground_truth)
@@ -182,13 +185,13 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
 
         ylim(ys);
 
-        set(gca, 'TickLabelInterpreter', 'latex', 'FontSize', tickFontSize);
+        set(gca, 'FontSize', tickFontSize, 'FontName', FontName);
         
         % Display labels if provided
         if ~isempty(labels)
             xlabel(labels{i}, ...
-                   'Interpreter', 'latex', ...
-                   'FontSize', FontSize);
+                   'FontSize', FontSize, ...
+                   'FontName', FontName);
         end
 
         % Format Axes
@@ -214,9 +217,9 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
         text(0.5, 1, message, ...
              'HorizontalAlignment', 'center', ...
              'VerticalAlignment', 'top', ...
-             'Interpreter', 'latex', ...
              'Units', 'normalized', ...
-             'FontSize', FontSize);
+             'FontSize', FontSize, ...
+             'FontName', FontName);
 
          % Set axes length = 1
         xlim([0 1]);
@@ -235,8 +238,8 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     % Plot the legends
     lh = legend(legend_handlers, legend_labels, ...
                 'Orientation', 'horizontal', ...
-                'Interpreter', 'latex', ...
-                'FontSize', FontSize);
+                'FontSize', FontSize, ...
+                'FontName', FontName);
 
     % Place them north
     lh.Layout.Tile = 'north';

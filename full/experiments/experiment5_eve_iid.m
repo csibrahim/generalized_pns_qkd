@@ -25,9 +25,15 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 % Plotting Options
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-FigureWidth = 1200;  % Width of the figure in points
-FontSize = 24;       % Font size for plot labels and text
-CIp = 0.99;          % Confidence interval threshold
+scale = 2;                    % Factor scaling for screen readability
+FigureWidth = 180;              % Width of the figure in mm
+FontSize = 8;                   % Font size for plot labels and text
+FontName = 'Times New Roman';   % Font name for plot labels and text
+CIp = 0.99;                     % Confidence interval threshold
+
+% Scale the figure size and font
+FigureWidth = FigureWidth * scale;
+FontSize = FontSize * scale;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Session Parameters
@@ -132,6 +138,7 @@ params = {true_thetas, sample_thetas, ...
           sigma, Nl, ...
           algorithm, maxIters, ...
           Ns, Nb, ...
+          FontSize, FontName, FigureWidth, ...
           method, display, chunkSize};
 
 if (~loadData)
@@ -163,7 +170,7 @@ end
 % Display Results
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Get LaTeX-formatted labels
+% Get labels
 [param_labels, K_labels] = getLabels(Nl, varR);
 
 % Display posterior distributions of parameters
