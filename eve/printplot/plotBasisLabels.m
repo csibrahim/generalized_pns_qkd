@@ -12,7 +12,7 @@ function plotBasisLabels(blocks, FontSize, FontName)
 
     % Define labels for bases match cases
     % bases_labels = {'a ≠ b', 'a = b'};
-    bases_labels = {'Non-matching Bases (a ≠ b)', 'Matching Bases (a = b)'};
+    bases_labels = {'Non-matching bases', 'Matching bases '};
     
     for i=1:numel(bases_labels)
         
