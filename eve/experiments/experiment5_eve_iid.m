@@ -26,10 +26,11 @@ addpath(genpath('../.'));  % Add all subfolders to the search path
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 scale = 2;                    % Factor scaling for screen readability
-FigureWidth = 180;              % Width of the figure in mm
-FontSize = 8;                   % Font size for plot labels and text
-FontName = 'Times New Roman';   % Font name for plot labels and text
-CIp = 0.99;                     % Confidence interval threshold
+FigureWidth = 180;            % Width of the figure in mm
+FontSize = 8;                 % Font size for plot labels and text
+FontName = 'Times New Roman'; % Font name for plot labels and text
+Interpreter = 'latex';        % Font rendering (latex or tex)
+CIp = 0.99;                   % Confidence interval threshold
 
 % Scale the figure size and font
 FigureWidth = FigureWidth * scale;
@@ -129,7 +130,7 @@ thetaP = {alphas, betas, ub, lb};
 params = {thetaA, thetaB, thetaE, thetaP, ...
           algorithm, maxIters, ...
           Ns, Nb, ...
-          FontSize, FontName, FigureWidth, ...
+          FontSize, FontName, Interpreter, FigureWidth, ...
           method, display, chunkSize};
 
 if(~loadData)
@@ -163,8 +164,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Get LaTeX-formatted labels
-param_labels = {'d_{AE}','p_{EB}','k','∆'};
-K_labels = arrayfun(@(x) sprintf('K_{%d}', x), 1:Nl, 'UniformOutput', false);
+param_labels = {'d^{}_{AE}','p^{}_{EB}','k','\Delta'};
+K_labels = arrayfun(@(x) sprintf('K^{}_{%d}', x), 1:Nl, 'UniformOutput', false);
 
 % Display posterior distributions of parameters
 [upper_params, medians_params, lowers_params] = displayHistograms(samples, thetaP{3}, thetaP{4}, ...
@@ -173,6 +174,7 @@ K_labels = arrayfun(@(x) sprintf('K_{%d}', x), 1:Nl, 'UniformOutput', false);
                                                                   'CIp', CIp, ... 
                                                                   'FontSize', FontSize, ...
                                                                   'FontName', FontName, ...
+                                                                  'Interpreter', Interpreter, ...
                                                                   'FigureWidth', FigureWidth);
 params_plot = gcf;
 
@@ -183,6 +185,7 @@ params_plot = gcf;
                                                     'CIp', CIp, ... 
                                                     'FontSize', FontSize, ...
                                                     'FontName', FontName, ...
+                                                    'Interpreter', Interpreter, ...
                                                     'FigureWidth', FigureWidth);
 
 Ks_plot = gcf;

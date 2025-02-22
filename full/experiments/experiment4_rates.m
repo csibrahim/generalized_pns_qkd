@@ -30,6 +30,7 @@ scale = 2;                    % Factor scaling for screen readability
 FigureWidth = 180 ;           % Width of the figure in mm
 FontSize = 8;                 % Font size for plot labels and text
 FontName = 'Times New Roman'; % Font name for plot labels and text
+Interpreter = 'latex';        % Font rendering (latex or tex)
 aspectRatio = 2/5;            % Ratio of height/width
 plot_spacing = 0.1;           % Spacing in km for theoretical distances
 majorTick = 10;               % Major-ticks spacing
@@ -70,7 +71,7 @@ mus = [1 5 10];
 
 x_label = 'Distance in km';
 y_label = 'K ';
-prepFigure(FigureWidth, aspectRatio, FontSize, FontName, x_label, y_label);
+prepFigure(FigureWidth, aspectRatio, FontSize, FontName, Interpreter, x_label, y_label);
 
 lineWidth = FigureWidth / 200;
 
@@ -112,10 +113,17 @@ for i = 1:Nl
 end
 
 % Legend labels
-intensities_legends = arrayfun(@(x) sprintf('Proposed (\\mu = %d)', x), mus, 'UniformOutput', false);
-decoy_legend = {['Decoy (\mu = ', num2str(mu), ')']};
-corrected_legend = {['Corrected Decoy (\mu = ', num2str(mu), ')']};
-proposed_legend = {['Proposed (\mu = ', num2str(mu), ')']};
+if strcmp(Interpreter, 'latex')
+    intensities_legends = arrayfun(@(x) sprintf('Proposed ($\\mu$ = %d)', x), mus, 'UniformOutput', false);
+    decoy_legend = {['Decoy ($\mu$ = ', num2str(mu), ')']};
+    corrected_legend = {['Corrected Decoy ($\mu$ = ', num2str(mu), ')']};
+    proposed_legend = {['Proposed ($\mu$ = ', num2str(mu), ')']};
+else
+    intensities_legends = arrayfun(@(x) sprintf('Proposed (\\mu = %d)', x), mus, 'UniformOutput', false);
+    decoy_legend = {['Decoy (\mu = ', num2str(mu), ')']};
+    corrected_legend = {['Corrected Decoy (\mu = ', num2str(mu), ')']};
+    proposed_legend = {['Proposed (\mu = ', num2str(mu), ')']};
+end
 
 % Legend handles
 legends = [decoy_legend, corrected_legend, proposed_legend, intensities_legends(:)'];
@@ -127,6 +135,7 @@ legend(handles, legends, ...
        'Orientation', 'horizontal', ....
        'FontSize', FontSize, ...
        'FontName', FontName, ...
+       'Interpreter', Interpreter, ...
        'NumColumns', 3);
 
 % Set the y-axis scale to logarithmic

@@ -14,6 +14,7 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     %                 'numBins'      - Number of histogram bins (default: 50)
     %                 'FontSize'     - Font size for labels (default: 8)
     %                 'FontName'     - Font size for labels (default: Times New Roman)
+    %                 'Interpreter'  - Font rendering, 'latex' or 'tex' (default: 'latex')
     %                 'FigureWidth'  - Figure width in mm (default: 180)
     %                 'newFigure'    - Flag to create a new figure (default: true)
     %                 'message'      - Message to display (default: none)
@@ -42,6 +43,7 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     addParameter(p, 'numBins', 50);
     addParameter(p, 'FontSize', 8);
     addParameter(p, 'FontName', 'Times New Roman');
+    addParameter(p, 'Interpreter', 'latex');
     addParameter(p, 'FigureWidth', 180);
     addParameter(p, 'newFigure', true);
     addParameter(p, 'message', []);
@@ -58,9 +60,14 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     numBins = p.Results.numBins;
     FontSize = p.Results.FontSize;
     FontName = p.Results.FontName;
+    Interpreter = p.Results.Interpreter;
     FigureWidth = p.Results.FigureWidth;
     newFigure = p.Results.newFigure;
     message = p.Results.message;
+
+    if strcmp(Interpreter, 'latex')
+        labels = cellfun(@(s) ['$', s, '$'], labels, 'UniformOutput', false);
+    end
 
     if (iscell(ground_truth))
         ground_truth = [ground_truth{:}];
@@ -80,8 +87,13 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     % Legend labels
     label_mean = {'Mean'};
     label_KDE = {'KDE'};
-    label_CI = {['CI(', num2str(100 * CIp), '%)']};
     label_ground_truth = [];
+
+    if strcmp(Interpreter, 'latex')
+        label_CI = {['$\mathrm{CI}_{', num2str(100 * CIp), '\%}$']};
+    else
+        label_CI = {['CI(', num2str(100 * CIp), '%)']};
+    end
     
     if ~isempty(ground_truth)
         label_ground_truth = 'Ground Truth';
@@ -185,13 +197,14 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
 
         ylim(ys);
 
-        set(gca, 'FontSize', tickFontSize, 'FontName', FontName);
+        set(gca, 'FontSize', tickFontSize, 'FontName', FontName, 'TickLabelInterpreter', Interpreter);
         
         % Display labels if provided
         if ~isempty(labels)
             xlabel(labels{i}, ...
                    'FontSize', FontSize, ...
-                   'FontName', FontName);
+                   'FontName', FontName, ...
+                   'Interpreter', Interpreter);
         end
 
         % Format Axes
@@ -219,7 +232,8 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
              'VerticalAlignment', 'top', ...
              'Units', 'normalized', ...
              'FontSize', FontSize, ...
-             'FontName', FontName);
+             'FontName', FontName, ...
+             'Interpreter', Interpreter);
 
          % Set axes length = 1
         xlim([0 1]);
@@ -234,12 +248,12 @@ function [uppers, medians, lowers] = displayHistograms(samples, ub, lb, varargin
     legend_handlers = [h_area, h_ground_truth, h_mean, h_pdf];
     legend_labels = [label_CI, label_ground_truth, label_mean, label_KDE];
 
-
     % Plot the legends
     lh = legend(legend_handlers, legend_labels, ...
                 'Orientation', 'horizontal', ...
                 'FontSize', FontSize, ...
-                'FontName', FontName);
+                'FontName', FontName, ...
+                'Interpreter', Interpreter);
 
     % Place them north
     lh.Layout.Tile = 'north';

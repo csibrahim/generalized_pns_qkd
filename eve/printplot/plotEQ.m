@@ -18,6 +18,7 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
     %                 'split'       - Flag to split bases configurations (default: true)
     %                 'FontSize'    - Font size for text and labels (default: 8)
     %                 'FontName'    - Name of the font for labels and text (default: Times New Roman)
+    %                 'Interpreter' - Font rendering, 'latex' or 'tex' (default: 'latex')
     %                 'FigureWidth' - Width of figure in mm (default: 180)
     %
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
@@ -32,6 +33,7 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
     addParameter(p, 'split', true);
     addParameter(p, 'FontSize', 8);
     addParameter(p, 'FontName', 'Times New Roman');
+    addParameter(p, 'Interpreter', 'latex');
     addParameter(p, 'FigureWidth', 180);
 
     % Parse input arguments
@@ -45,14 +47,17 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
     split = p.Results.split;
     FontSize = p.Results.FontSize;
     FontName = p.Results.FontName;
+    Interpreter = p.Results.Interpreter;
     FigureWidth = p.Results.FigureWidth;
 
     if(isempty(LegendNames))
         if(isempty(Qs_ref))
-            LegendNames = {'Theory'};
+            LegendNames = {''};
         else
-            LegendNames = {'P','Q'};
+            LegendNames = {'P - ','Q - '};
         end
+    else
+        LegendNames = cellfun(@(x) [x ' - '], LegendNames, 'UniformOutput', false);
     end
 
     cols = size(R, 2);
@@ -86,14 +91,18 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
 
 
     % Prepare figure and layout
-    prepFigure(FigureWidth, rows/cols, FontSize, FontName);
+    prepFigure(FigureWidth, rows/cols, FontSize, FontName, Interpreter);
     
     tiledlayout(rows, cols, ...
                 'TileSpacing', 'compact', ...
                 'Padding', 'compact');
 
     % Generate x-axis labels for intensity levels
-    x_labels = arrayfun(@(x) sprintf('λ_{%d}', x), 1:Nl, 'UniformOutput', false);
+    x_labels = arrayfun(@(x) sprintf('\\lambda^{}_{%d}', x), 1:Nl, 'UniformOutput', false);
+
+    if strcmp(Interpreter,'latex')
+        x_labels = cellfun(@(s) ['$', s, '$'], x_labels, 'UniformOutput', false);
+    end
     
     % Loop through data types (signal (S) and error (R) counts)
     for i = 1:numel(data)
@@ -106,7 +115,7 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
             else
                 p = {Ps{i}(j), Ps_ref{i}(j)};
             end
-            plotPMFs(N, p, CIp, data{i}(:, j), FontSize, FontName, x_labels{j});
+            plotPMFs(N, p, CIp, data{i}(:, j), FontSize, FontName, Interpreter, x_labels{j});
         end
 
         
@@ -127,7 +136,7 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
                     p = {Ps{i}(Nl+j), Ps_ref{i}(Nl+j)};
                 end
 
-                plotPMFs(N, p, CIp, data{i}(:, Nl+j), FontSize, FontName, x_labels{j});
+                plotPMFs(N, p, CIp, data{i}(:, Nl+j), FontSize, FontName, Interpreter, x_labels{j});
             end
 
         end
@@ -137,7 +146,8 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
                   'Units', 'normalized', ...
                   'HorizontalAlignment', 'left', ...
                   'FontSize', FontSize, ...
-                  'FontName', FontName);
+                  'FontName', FontName, ...
+                  'Interpreter', Interpreter);
 
         % Adjust position of row labels by half FontSize
         set(th, 'Units', 'points');
@@ -149,11 +159,11 @@ function plotEQ(N, R, S, EQs, Qs, varargin)
     end
 
     % Add legends for CI, data, and theory
-    plotPMFLegends(CIp, FontSize, FontName, LegendNames);
+    plotPMFLegends(CIp, FontSize, FontName, Interpreter, LegendNames);
     
     % Add legends for basis match (a = b and a ≠ b), if split = true
     if split
-        plotBasisLabels(blocks, FontSize, FontName);
+        plotBasisLabels(blocks, FontSize, FontName, Interpreter);
     end
 
 end

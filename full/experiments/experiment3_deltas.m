@@ -32,6 +32,7 @@ scale = 2;                    % Factor scaling for screen readability
 FigureWidth = 180;            % Width of the figure in mm
 FontSize = 8;                 % Font size for plot labels and text
 FontName = 'Times New Roman'; % Font name for plot labels and text
+Interpreter = 'latex';        % Font rendering (latex or tex)
 CIp = 0.99;                   % Confidence interval threshold
 aspectRatio = 1/3;            % Ratio of height/width
 plot_spacing = 1;             % Spacing in km for theoretical distances
@@ -76,9 +77,9 @@ dAB = 150;           % Maximum distance between Alice and Bob in km
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 x_label = 'Distance in km';
-y_label = 'δ ';
+y_label = '\delta ';
 
-prepFigure(FigureWidth, aspectRatio, FontSize, FontName, x_label, y_label);
+prepFigure(FigureWidth, aspectRatio, FontSize, FontName, Interpreter, x_label, y_label);
 
 lineWidth = FigureWidth / 100;
 markerSize = FigureWidth / 50;
@@ -156,15 +157,20 @@ for i = 1:numel(Qs)
     h_E.Color = [0 0 0 0.5];
 
     % Place a label at the end of each line
-    if i == 1
-        lineLabel = {'Decoy', '(p_{a} = 0%)'};
-    else
-        lineLabel = ['p_{a}= ', num2str(100 * pas(i - 1)), '%'];
+    lineLabel = ['p^{}_{a}= ', num2str(100 * pas(max(i - 1, 1)))];
+
+    if strcmp(Interpreter, 'latex')
+        lineLabel = ['$',lineLabel,'\%$'];
+    end
+
+    if(i==1)
+        lineLabel = {'Decoy', ['(',lineLabel,')']};
     end
     
     text(max(dABs) * 1.01, E_rho(end), lineLabel, ...
          'FontSize', FontSize, ...
-         'FontName', FontName);
+         'FontName', FontName, ...
+         'Interpreter', Interpreter);
 end
 
 % Define colors for each after-pulsing probability and initialize plot handles
@@ -179,9 +185,15 @@ for j = 1:n_pa
 end
 
 % Configure legend labels
-CI_legend = {['CI(', num2str(100*CIp), '%)']};
 E_legend = {'Expected Value'};
-data_legends = arrayfun(@(x) sprintf('%d%%', x), 100 * pas, 'UniformOutput', false);
+
+if strcmp(Interpreter, 'latex')
+    CI_legend = {['$\mathrm{CI}_{', num2str(100*CIp), '\%}$']};
+    data_legends = arrayfun(@(x) sprintf('%d\\%%', x), 100 * pas, 'UniformOutput', false);
+else
+    CI_legend = {['CI(', num2str(100*CIp), '%)']};
+    data_legends = arrayfun(@(x) sprintf('%d%%', x), 100 * pas, 'UniformOutput', false);
+end
 
 % Configure legends handles
 handles = [h_CI, h_E, h_data{:}];
@@ -192,7 +204,8 @@ legend(handles, legends, ...
        'Location', 'northoutside', ...
        'Orientation', 'horizontal', ...
        'FontSize', FontSize, ...
-       'FontName', FontName);
+       'FontName', FontName, ...
+       'Interpreter', Interpreter);
 
 % Remove padding around the axes, but leave 10% to the east for legends
 set(gca, 'LooseInset', [0, 0, 0.1, 0]);

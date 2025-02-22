@@ -11,6 +11,7 @@ function plotPs(Ps, C, varargin)
     %                   'CIp'         - Confidence interval threshold (default: 0.99)
     %                   'FontSize'    - Font size for labels and text (default: 8)
     %                   'FontName'    - Name of the font for labels and text (default: Times New Roman)
+    %                   'Interpreter' - Font rendering, 'latex' or 'tex' (default: 'latex')
     %                   'FigureWidth' - Figure width in mm (default: 180)
     %
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
@@ -24,6 +25,7 @@ function plotPs(Ps, C, varargin)
     addParameter(p, 'CIp', 0.99);
     addParameter(p, 'FontSize', 8);
     addParameter(p, 'FontName', 'Times New Roman');
+    addParameter(p, 'Interpreter', 'latex');
     addParameter(p, 'FigureWidth', 180);
 
     % Parse input arguments
@@ -35,14 +37,17 @@ function plotPs(Ps, C, varargin)
     CIp = p.Results.CIp;
     FontSize = p.Results.FontSize;
     FontName = p.Results.FontName;
+    Interpreter = p.Results.Interpreter;
     FigureWidth = p.Results.FigureWidth;
-
+    
     if(isempty(LegendNames))
         if(isempty(Ps_ref))
-            LegendNames = {'Theory'};
+            LegendNames = {''};
         else
-            LegendNames = {'P','Q'};
+            LegendNames = {'P - ','Q - '};
         end
+    else
+        LegendNames = cellfun(@(x) [x ' - '], LegendNames, 'UniformOutput', false);
     end
 
     % Calculate total trials and number of intensity levels
@@ -64,11 +69,16 @@ function plotPs(Ps, C, varargin)
     ratio = (blocks*rows+1)/(blocks*cols+1);
 
     % Prepare figure with specified width and ratio
-    prepFigure(FigureWidth, ratio, FontSize, FontName);
+    prepFigure(FigureWidth, ratio, FontSize, FontName, Interpreter);
 
     % Labels for rows and intensities
     row_labels = {'00', '01', '10', '11'};
-    x_labels = arrayfun(@(x) sprintf('λ_{%d}', x), 1:Nl, 'UniformOutput', false);
+    
+    x_labels = arrayfun(@(x) sprintf('\\lambda^{}_{%d}', x), 1:Nl, 'UniformOutput', false);
+
+    if strcmp(Interpreter,'latex')
+        x_labels = cellfun(@(s) ['$', s, '$'], x_labels, 'UniformOutput', false);
+    end
 
     % Create tiled layout for plots
     tiledlayout(blocks*rows+1, blocks*cols+1, ...
@@ -92,7 +102,7 @@ function plotPs(Ps, C, varargin)
                 p = {Ps(not_matched(j)), Ps_ref(not_matched(j))};
             end
 
-            plotPMFs(N, p, CIp, C(:, not_matched(j)), FontSize, FontName, x_labels{j});
+            plotPMFs(N, p, CIp, C(:, not_matched(j)), FontSize, FontName, Interpreter, x_labels{j});
 
         end
 
@@ -111,7 +121,7 @@ function plotPs(Ps, C, varargin)
             end
 
 
-            plotPMFs(N, p, CIp, C(:, matched(j)), FontSize, FontName, x_labels{j});
+            plotPMFs(N, p, CIp, C(:, matched(j)), FontSize, FontName, Interpreter, x_labels{j});
         end
     
         % Add row labels for detector configurations
@@ -120,7 +130,8 @@ function plotPs(Ps, C, varargin)
                  'HorizontalAlignment', 'left', ...
                  'VerticalAlignment', 'middle', ...
                  'FontSize', FontSize, ...
-                 'FontName', FontName);
+                 'FontName', FontName, ...
+                 'Interpreter', Interpreter);
 
         % Adjust position of row labels by half FontSize
         set(th, 'Units', 'points');
@@ -133,9 +144,9 @@ function plotPs(Ps, C, varargin)
     end
 
     % Add legends for CI, data, and theory
-    plotPMFLegends(CIp, FontSize, FontName, LegendNames);
+    plotPMFLegends(CIp, FontSize, FontName, Interpreter, LegendNames);
 
     % Add legends for basis match (a = b and a ≠ b), if split = true
-    plotBasisLabels(blocks, FontSize, FontName);
+    plotBasisLabels(blocks, FontSize, FontName, Interpreter);
 
 end

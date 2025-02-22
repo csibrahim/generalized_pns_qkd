@@ -22,6 +22,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, varR, varF, thet
     %                       'CIp'          - Confidence level (default: 0.99)
     %                       'FontSize'     - Font size for labels and text (default: 8)
     %                       'FontName'     - Font size for labels (default: Times New Roman)
+    %                       'Interpreter'  - Font rendering, 'latex' or 'tex' (default: 'latex')
     %                       'FigureWidth'  - Width of the figure in points (default: 180)
     %
     % Outputs:
@@ -40,6 +41,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, varR, varF, thet
     addParameter(p, 'CIp', 0.99);
     addParameter(p, 'FontSize', 8);
     addParameter(p, 'FontName', 'Times New Roman');
+    addParameter(p, 'Interpreter', 'latex');
     addParameter(p, 'FigureWidth', 180);
 
     % Parse input arguments
@@ -53,6 +55,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, varR, varF, thet
     CIp = p.Results.CIp;
     FontSize = p.Results.FontSize;
     FontName = p.Results.FontName;
+    Interpreter = p.Results.Interpreter;
     FigureWidth = p.Results.FigureWidth;
 
     % Total iterations, including burn-in
@@ -80,7 +83,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, varR, varF, thet
         rows = ceil(sqrt(dim/4));
         cols = ceil(dim / rows);
         ratio = rows/cols;
-        f = prepFigure(FigureWidth, ratio,  FontSize, FontName);
+        f = prepFigure(FigureWidth, ratio,  FontSize, FontName, Interpreter);
         set(f, 'KeyPressFcn', @keyPressCallback);
     end
 
@@ -140,6 +143,7 @@ function [samples, logPDFs] = sample(method, theta0, Ns, Nb, C, varR, varF, thet
                                   'CIp', CIp, ...
                                   'FontSize', FontSize, ...
                                   'FontName', FontName, ...
+                                  'Interpreter', Interpreter, ...
                                   'FigureWidth', FigureWidth, ...
                                   'newFigure', false, ...
                                   'message', 'Press CTRL+C any time to stop the sampling process');

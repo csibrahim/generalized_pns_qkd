@@ -1,15 +1,16 @@
-function plotPMFs(N, p, CIp, data, FontSize, FontName, label)
+function plotPMFs(N, p, CIp, data, FontSize, FontName, Interpreter, label)
     %plotPMFs: Creates a bar plot comparing observed data with theoretical 
     %          binomial probabilities, including confidence intervals.
     %
     % Inputs:
-    %   N         - Total trials for the binomial distribution
-    %   p         - Success probability for each trial
-    %   CIp       - Confidence level (e.g., 0.95 for 95% CI)
-    %   data      - Observed data values
-    %   FontSize  - Font size for labels (default: 8)
-    %   FontName  - Name of the font for labels and text (default: Times New Roman)
-    %   label     - X-axis label (default: none)
+    %   N            - Total trials for the binomial distribution
+    %   p            - Success probability for each trial
+    %   CIp          - Confidence level (e.g., 0.95 for 95% CI)
+    %   data         - Observed data values
+    %   FontSize     - Font size for labels (default: 8)
+    %   FontName     - Name of the font for labels and text (default: Times New Roman)
+    %   Interpreter  - Font rendering, 'latex' or 'tex' (default: 'latex')
+    %   label        - X-axis label (default: none)
     %
     % Copyright (c) 2024 Ibrahim Almosallam <ibrahim@almosallam.org>
     % Licensed under the MIT License (see LICENSE file for full details).
@@ -17,7 +18,8 @@ function plotPMFs(N, p, CIp, data, FontSize, FontName, label)
     % Set default values for optional inputs
     if (nargin < 5),  FontSize = 8; end
     if (nargin < 6),  FontName = 'Times New Roman'; end
-    if (nargin < 7),  label = []; end
+    if (nargin < 7),  Interpreter = 'latex'; end
+    if (nargin < 8),  label = []; end
 
     % Adjust font size for tick labels
     tickFontSize = max(FontSize * (5 / 8), 5);
@@ -109,7 +111,8 @@ function plotPMFs(N, p, CIp, data, FontSize, FontName, label)
     % Format tick labels and adjust font sizes
     set(gca, ...
         'FontSize', tickFontSize, ...
-        'FontName', FontName ...
+        'FontName', FontName, ...
+        'TickLabelInterpreter', Interpreter ...
         );
 
     ax = gca;
@@ -118,9 +121,9 @@ function plotPMFs(N, p, CIp, data, FontSize, FontName, label)
 
     % Add x-axis label
     xlabel(label, ...
-           'Interpreter', 'tex', ...
            'FontSize', FontSize, ...
-           'FontName', FontName ...
+           'FontName', FontName, ...
+           'Interpreter', Interpreter ...
            );
 
     % Adjust x-ticks to show integers only
